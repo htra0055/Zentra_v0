@@ -9,7 +9,7 @@
 import UIKit
 
 struct Mood {
-    let name: String
+    let id: String
     let subtitle: String
     let color: UIColor
     let energy: Int

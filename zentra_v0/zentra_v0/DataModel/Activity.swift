@@ -15,23 +15,12 @@ struct Activity {
     let latitude: Double
     let longitude: Double
     let category: String
+    let rating: Double?
+    let photoURL: String?
+    
+    //    var coordinate: CLLocationCoordinate2D {
+    //        CLLocationCoordinate2D(latitude: lat, longitude: lon)
+    //    }
 }
-
-
-// version with more content, maybe develop later
-//struct Activity {
-//    let id: UUID
-//    let title: String
-//    let description: String?
-//    let lat: Double
-//    let lon: Double
-//    let category: String?
-//    let rating: Double?
-//    let photoURL: String?
-//
-//    var coordinate: CLLocationCoordinate2D {
-//        CLLocationCoordinate2D(latitude: lat, longitude: lon)
-//    }
-//}
 
 
