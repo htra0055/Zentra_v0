@@ -41,7 +41,7 @@ class LoginSignupViewController: UIViewController {
 //            }
 //
 //            DispatchQueue.main.async {
-//                self.performSegue(withIdentifier: "showMainApp", sender: nil)
+//                self.performSegue(withIdentifier: "showHomePage", sender: nil)
 //            }
 //        }
         
@@ -57,6 +57,8 @@ class LoginSignupViewController: UIViewController {
             
             // Success: user is now created
             if let user = Auth.auth().currentUser {
+                let appDelegate = UIApplication.shared.delegate as? AppDelegate
+                (appDelegate?.databaseController as? FirebaseController)?.startDatabase(for: user)
                 DispatchQueue.main.async {
                     self.showAlert(
                         title: "Congratulations",
@@ -67,7 +69,7 @@ class LoginSignupViewController: UIViewController {
 
             
 //            DispatchQueue.main.async {
-//                self.performSegue(withIdentifier: "showMainApp", sender: nil)
+//                self.performSegue(withIdentifier: "showHomePage", sender: nil)
 //            }
         }
 
@@ -97,7 +99,7 @@ class LoginSignupViewController: UIViewController {
 //
 //                // Navigate to next screen
 //                DispatchQueue.main.async {
-//                    self.performSegue(withIdentifier: "showMainApp", sender: nil)
+//                    self.performSegue(withIdentifier: "showHomePage", sender: nil)
 //                }
 //            }
         
@@ -114,7 +116,7 @@ class LoginSignupViewController: UIViewController {
             }
 
             DispatchQueue.main.async {
-                self.performSegue(withIdentifier: "showMainApp", sender: nil)
+                self.performSegue(withIdentifier: "showHomePage", sender: nil)
             }
         }
         
