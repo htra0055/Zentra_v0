@@ -98,7 +98,7 @@
         <!--Plan-->
         <scene sceneID="CoZ-Hd-dBq">
             <objects>
-                <viewController id="XkA-qp-jps" customClass="PlanViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Plan" id="XkA-qp-jps" customClass="PlanViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="JRM-zT-ezf" customClass="Pla">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -106,6 +106,7 @@
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
                     <tabBarItem key="tabBarItem" title="Plan" image="calendar" catalog="system" id="8pE-Vb-RNt"/>
+                    <navigationItem key="navigationItem" id="het-De-RbR"/>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ozn-I8-ANy" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -191,6 +192,9 @@
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="13"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" title="Create My Trip Plan"/>
+                                <connections>
+                                    <action selector="createPlanTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="JyE-Y7-JeI"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="Your Selection" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="yhw-cW-jOf">
                                 <rect key="frame" x="22" y="602.33333333333326" width="79" height="13.333333333333371"/>
@@ -210,12 +214,18 @@
                                                 <rect key="contentStretch" x="1" y="0.0" width="1" height="1"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Adventure"/>
+                                                <connections>
+                                                    <action selector="interestTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="TfO-Nl-ZwP"/>
+                                                </connections>
                                             </button>
                                             <button contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qKD-kE-B9j">
                                                 <rect key="frame" x="186" y="0.0" width="167" height="34"/>
                                                 <color key="backgroundColor" red="0.83137255909999996" green="0.6549019814" blue="0.63921570780000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Cultural"/>
+                                                <connections>
+                                                    <action selector="interestTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="n9r-ec-0uA"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                         <rect key="contentStretch" x="0.050000000000000003" y="0.0" width="1" height="1"/>
@@ -228,12 +238,18 @@
                                                 <color key="backgroundColor" red="0.83137255909999996" green="0.6549019814" blue="0.63921570780000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Foodie"/>
+                                                <connections>
+                                                    <action selector="interestTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="FdP-82-3Hj"/>
+                                                </connections>
                                             </button>
                                             <button contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="b6v-Yy-ZwX">
                                                 <rect key="frame" x="186" y="0.0" width="167" height="34"/>
                                                 <color key="backgroundColor" red="0.83137255909999996" green="0.6549019814" blue="0.63921570780000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Nightlife"/>
+                                                <connections>
+                                                    <action selector="interestTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="un6-Zf-FDg"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                     </stackView>
@@ -245,12 +261,18 @@
                                                 <color key="backgroundColor" red="0.83137255909999996" green="0.6549019814" blue="0.63921570780000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Relaxation"/>
+                                                <connections>
+                                                    <action selector="interestTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="JN1-45-tjG"/>
+                                                </connections>
                                             </button>
                                             <button contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hXl-Bo-zUM">
                                                 <rect key="frame" x="186" y="0.0" width="167" height="34"/>
                                                 <color key="backgroundColor" red="0.83137255909999996" green="0.6549019814" blue="0.63921570780000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                 <state key="normal" title="Nature"/>
+                                                <connections>
+                                                    <action selector="interestTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="cMd-gI-ueo"/>
+                                                </connections>
                                             </button>
                                         </subviews>
                                     </stackView>
@@ -278,6 +300,9 @@
                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Low Key - Relaxed pace, minimal planing"/>
+                                        <connections>
+                                            <action selector="energyTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="OHS-XJ-cC9"/>
+                                        </connections>
                                     </button>
                                     <button contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XK8-vW-JgD">
                                         <rect key="frame" x="0.0" y="32" width="358" height="28"/>
@@ -285,6 +310,9 @@
                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="Balanced - Mixed of activities and downtime"/>
+                                        <connections>
+                                            <action selector="energyTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="RLY-lN-mza"/>
+                                        </connections>
                                     </button>
                                     <button contentMode="scaleToFill" ambiguous="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="3Ey-2Y-LVU">
                                         <rect key="frame" x="0.0" y="64" width="358" height="28"/>
@@ -292,6 +320,9 @@
                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="13"/>
                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                         <state key="normal" title="High Energy - Packed Schedule, maximum experiences"/>
+                                        <connections>
+                                            <action selector="energyTapped:" destination="wjB-8V-GNY" eventType="touchUpInside" id="gbb-Ld-k0V"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                                 <rect key="contentStretch" x="0.050000000000000003" y="0.0" width="1" height="1"/>
@@ -315,6 +346,9 @@
                                     <segment title="Week"/>
                                     <segment title="Extended"/>
                                 </segments>
+                                <connections>
+                                    <action selector="tripDurationChanged:" destination="wjB-8V-GNY" eventType="valueChanged" id="CYb-Ts-TJ1"/>
+                                </connections>
                             </segmentedControl>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" ambiguous="YES" text="7+ days" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QNL-oO-h02">
                                 <rect key="frame" x="291" y="546.33333333333337" width="39.333333333333314" height="11"/>
@@ -322,6 +356,9 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <stackView opaque="NO" contentMode="scaleToFill" ambiguous="YES" axis="vertical" translatesAutoresizingMaskIntoConstraints="NO" id="Orw-nE-bLq">
+                                <rect key="frame" x="109" y="598" width="258" height="81"/>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="ozW-5c-4dL"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -331,6 +368,7 @@
                             <constraint firstItem="ozW-5c-4dL" firstAttribute="trailing" secondItem="qHq-aa-PXt" secondAttribute="trailing" constant="257" id="3c8-gc-d1R"/>
                             <constraint firstItem="ozW-5c-4dL" firstAttribute="trailing" secondItem="Fug-9o-eA4" secondAttribute="trailing" constant="20" id="4fS-AL-w3B"/>
                             <constraint firstItem="oH7-lD-Qph" firstAttribute="leading" secondItem="4WU-ed-kT8" secondAttribute="trailing" constant="85" id="5JV-nd-SOX"/>
+                            <constraint firstItem="Orw-nE-bLq" firstAttribute="top" secondItem="oH7-lD-Qph" secondAttribute="bottom" constant="40.670000000000002" id="63Y-oM-bLs"/>
                             <constraint firstItem="4WU-ed-kT8" firstAttribute="top" secondItem="S79-vT-EoK" secondAttribute="bottom" constant="5" id="6dF-07-j16"/>
                             <constraint firstItem="Fug-9o-eA4" firstAttribute="top" secondItem="sSi-31-QUd" secondAttribute="bottom" constant="10" id="6qC-Qf-cdu"/>
                             <constraint firstItem="qHq-aa-PXt" firstAttribute="leading" secondItem="ozW-5c-4dL" secondAttribute="leading" constant="20" id="A35-X7-eC2"/>
@@ -349,6 +387,7 @@
                             <constraint firstItem="suE-1e-Yz8" firstAttribute="top" secondItem="qHq-aa-PXt" secondAttribute="bottom" constant="10" id="NMl-XU-n8n"/>
                             <constraint firstItem="ozW-5c-4dL" firstAttribute="bottom" secondItem="Vj9-Wi-un2" secondAttribute="bottom" constant="20" id="OgO-XA-Kh6"/>
                             <constraint firstItem="hSR-q2-mHQ" firstAttribute="leading" secondItem="Q89-ru-spC" secondAttribute="leading" constant="46" id="Oxk-Wy-N9W"/>
+                            <constraint firstItem="Orw-nE-bLq" firstAttribute="leading" secondItem="yhw-cW-jOf" secondAttribute="trailing" constant="8" symbolic="YES" id="PCt-NA-0mY"/>
                             <constraint firstItem="ozW-5c-4dL" firstAttribute="trailing" secondItem="S79-vT-EoK" secondAttribute="trailing" constant="20" id="Y1e-h2-s7t"/>
                             <constraint firstItem="QNL-oO-h02" firstAttribute="top" secondItem="S79-vT-EoK" secondAttribute="bottom" constant="5" id="Ze0-qD-r3P"/>
                             <constraint firstItem="QNL-oO-h02" firstAttribute="top" secondItem="S79-vT-EoK" secondAttribute="bottom" constant="5" id="Zvs-HI-syY"/>
@@ -372,23 +411,25 @@
                             <constraint firstAttribute="trailing" secondItem="hSR-q2-mHQ" secondAttribute="trailing" constant="47" id="udZ-KW-Hdm"/>
                             <constraint firstItem="T3G-tz-uKe" firstAttribute="top" secondItem="Fug-9o-eA4" secondAttribute="bottom" constant="20" id="v82-bh-X0i"/>
                             <constraint firstItem="hSR-q2-mHQ" firstAttribute="top" secondItem="Q89-ru-spC" secondAttribute="top" constant="100" id="vQO-RW-qWy"/>
+                            <constraint firstItem="ozW-5c-4dL" firstAttribute="trailing" secondItem="Orw-nE-bLq" secondAttribute="trailing" constant="26" id="vf6-xe-658"/>
                             <constraint firstItem="ozW-5c-4dL" firstAttribute="trailing" secondItem="suE-1e-Yz8" secondAttribute="trailing" constant="20" id="xB4-Yf-qFV"/>
                             <constraint firstItem="S79-vT-EoK" firstAttribute="leading" secondItem="ozW-5c-4dL" secondAttribute="leading" constant="15" id="xhf-JQ-t4h"/>
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="Home" image="homekit" catalog="system" id="Y6l-tD-H5S"/>
                     <connections>
-                        <outlet property="AdventureButton" destination="KjY-EP-nUE" id="ZZd-fK-rZK"/>
+                        <outlet property="AdventureButton" destination="KjY-EP-nUE" id="D5Z-nL-4d5"/>
                         <outlet property="BalancedButton" destination="XK8-vW-JgD" id="tUR-pc-ycU"/>
                         <outlet property="CreatePlanButton" destination="Vj9-Wi-un2" id="eXM-gD-epJ"/>
                         <outlet property="CulturalButton" destination="qKD-kE-B9j" id="PcK-CS-cTY"/>
+                        <outlet property="DurationSegment" destination="S79-vT-EoK" id="j6x-mE-HeM"/>
                         <outlet property="FoodieButton" destination="OEg-w6-KiT" id="8Wj-AQ-XlJ"/>
                         <outlet property="HighenergyButton" destination="3Ey-2Y-LVU" id="Kx1-P4-Ojb"/>
                         <outlet property="LowkeyButton" destination="R2h-oq-06x" id="Si7-wC-dvh"/>
                         <outlet property="NatureButton" destination="hXl-Bo-zUM" id="XpP-gj-7nz"/>
                         <outlet property="NightlifeButton" destination="b6v-Yy-ZwX" id="jYu-7f-bs9"/>
                         <outlet property="RelaxationButton" destination="GrG-dg-wdQ" id="lEb-Pf-qP6"/>
-                        <outlet property="TripDurationSegments" destination="S79-vT-EoK" id="nB3-uM-yJ1"/>
+                        <outlet property="YourSelectionStackView" destination="Orw-nE-bLq" id="Fru-3p-7vQ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Nhd-av-JuW" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -400,11 +441,12 @@
             <objects>
                 <tabBarController id="WA4-bC-JUZ" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" title="Welcome to Zentra" id="BJR-8Q-72Z"/>
-                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="EYJ-9I-WYB">
+                    <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" id="EYJ-9I-WYB">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
                         <autoresizingMask key="autoresizingMask"/>
-                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                         <color key="tintColor" systemColor="tintColor"/>
+                        <color key="barTintColor" systemColor="systemBackgroundColor"/>
+                        <color key="selectedImageTintColor" systemColor="systemBackgroundColor"/>
                     </tabBar>
                     <connections>
                         <segue destination="wjB-8V-GNY" kind="relationship" relationship="viewControllers" id="9hZ-xg-G8v"/>
