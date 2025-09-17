@@ -10,7 +10,25 @@
 import Foundation
 import CoreLocation
 
-struct Plan {
-    var title: String
-    var activities: [Activity]
+
+struct Plan: Codable, Identifiable {
+    let id: UUID
+    let activities: [Activity]
+    let mood: Mood
+    let duration: TripDuration
+    let createdAt: Date
+    
+    init(activities: [Activity], mood: Mood, duration: TripDuration) {
+        self.id = UUID()
+        self.activities = activities
+        self.mood = mood
+        self.duration = duration
+        self.createdAt = Date()
+    }
+}
+
+enum TripDuration: String, Codable {
+    case weekend = "Weekend"
+    case week = "Week"
+    case extended = "Extended"
 }

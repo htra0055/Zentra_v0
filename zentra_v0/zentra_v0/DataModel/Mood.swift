@@ -8,9 +8,9 @@
 // Models/Mood.swift
 import UIKit
 
-struct Mood {
-    let id: String
-    let subtitle: String
-    let color: UIColor
-    let energy: Int
+
+enum Mood: String,Codable{
+    case Lowkey = "Lowkey"
+    case Balanced = "Balanced"
+    case HighEnergy = "High Energy"
 }
