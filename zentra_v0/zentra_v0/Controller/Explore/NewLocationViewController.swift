@@ -10,7 +10,7 @@
 import UIKit
 import CoreLocation
 
-class LiveMapViewController: UIViewController {
+class NewLocationViewController: UIViewController {
     
     
 }
