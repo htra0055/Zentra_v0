@@ -5,6 +5,10 @@
 //  Created by Evelyn Tran on 17/9/2025.
 //
 
+// TODO: Need a button for logout -> logout and go back to initial login, signup view
+// TODO: Need a button for reset -> clear the user selection (so they dont have to unselected all their option)
+// TODO: Need to cofigure storyboard for collection view (UI Images)
+
 import UIKit
 import CoreLocation
 
@@ -125,7 +129,7 @@ class VibeSelectionViewController: UIViewController  {
 //        }
         
         // Show notification to user
-        showAlert(title: "Plan Created", message: "Your plan has been successfully created!") {
+        showAlert(title: "Your Plan is saved and ready!", message: "") {
             // Pass plan to PlanViewController in tab bar
             if let tabBarController = self.tabBarController {
                 if let navController = tabBarController.viewControllers?[1] as? UINavigationController,

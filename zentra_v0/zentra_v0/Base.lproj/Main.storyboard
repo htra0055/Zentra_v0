@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="23727" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="WA4-bC-JUZ">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24127" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Cte-55-Ttc">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23721"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
+        <capability name="Map view configurations" minToolsVersion="14.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
@@ -17,31 +18,31 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Email" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="bsf-Zq-dyB">
-                                <rect key="frame" x="31" y="185" width="76" height="21"/>
+                                <rect key="frame" x="31" y="195" width="76" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Type your email" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="7Yh-OH-BI3">
-                                <rect key="frame" x="31" y="221" width="332" height="34"/>
+                                <rect key="frame" x="31" y="231" width="332" height="34"/>
                                 <color key="textColor" systemColor="systemIndigoColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" textContentType="email"/>
                             </textField>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Password" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="LGf-MH-z8g">
-                                <rect key="frame" x="31" y="281" width="91" height="21"/>
+                                <rect key="frame" x="31" y="291" width="91" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="Type your password " borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="e1b-fz-RWX">
-                                <rect key="frame" x="31" y="317" width="332" height="34"/>
+                                <rect key="frame" x="31" y="327" width="332" height="34"/>
                                 <color key="textColor" systemColor="systemIndigoColor"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" textContentType="password"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yfa-z1-wnp">
-                                <rect key="frame" x="31" y="424.66666666666669" width="332" height="38.333333333333314"/>
+                                <rect key="frame" x="31" y="434.66666666666669" width="332" height="38.333333333333314"/>
                                 <color key="backgroundColor" systemColor="systemGrayColor"/>
                                 <color key="tintColor" systemColor="systemGrayColor"/>
                                 <state key="normal" title="Button"/>
@@ -51,7 +52,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g8R-mq-Xqs">
-                                <rect key="frame" x="31" y="371" width="332" height="38.666666666666686"/>
+                                <rect key="frame" x="31" y="381" width="332" height="38.666666666666686"/>
                                 <color key="backgroundColor" systemColor="systemTealColor"/>
                                 <color key="tintColor" systemColor="systemMintColor"/>
                                 <state key="normal" title="Button"/>
@@ -113,20 +114,36 @@
             <point key="canvasLocation" x="1033" y="1755"/>
         </scene>
         <!--Explore-->
-        <scene sceneID="Zwj-6U-ban">
+        <scene sceneID="kQP-aE-FiE">
             <objects>
-                <viewController id="lC5-3d-K6C" customClass="LiveMapViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="VpW-3I-cMC">
+                <viewController id="17l-kz-ix7" customClass="MapViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="osl-B9-AR0">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="oDr-5k-E0d"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" restorationIdentifier="mapView" translatesAutoresizingMaskIntoConstraints="NO" id="Zs5-yt-Q6s">
+                                <rect key="frame" x="0.0" y="128" width="393" height="724"/>
+                                <standardMapConfiguration key="preferredConfiguration"/>
+                            </mapView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="76r-bj-eDZ"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="Zs5-yt-Q6s" firstAttribute="top" secondItem="76r-bj-eDZ" secondAttribute="top" constant="10" id="Lgh-P6-tpE"/>
+                            <constraint firstItem="Zs5-yt-Q6s" firstAttribute="trailing" secondItem="76r-bj-eDZ" secondAttribute="trailing" id="Pvw-UC-pxO"/>
+                            <constraint firstItem="Zs5-yt-Q6s" firstAttribute="leading" secondItem="76r-bj-eDZ" secondAttribute="leading" id="cwv-lG-gB8"/>
+                            <constraint firstAttribute="bottom" secondItem="Zs5-yt-Q6s" secondAttribute="bottom" id="jO0-A9-DGh"/>
+                            <constraint firstItem="Zs5-yt-Q6s" firstAttribute="top" secondItem="76r-bj-eDZ" secondAttribute="top" id="sDm-5t-c88"/>
+                        </constraints>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Explore" image="map" catalog="system" id="o2S-3R-KRx"/>
+                    <tabBarItem key="tabBarItem" title="Explore" image="map.fill" catalog="system" id="cjo-RZ-kNN"/>
+                    <connections>
+                        <outlet property="mapView" destination="Zs5-yt-Q6s" id="yL8-1j-37U"/>
+                    </connections>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="cYi-qz-0CC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="dVN-K3-dHd" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="2123" y="1755"/>
+            <point key="canvasLocation" x="2196" y="1755"/>
         </scene>
         <!--Activities-->
         <scene sceneID="4yE-Re-YIb">
@@ -439,7 +456,7 @@
         <!--Welcome to Zentra-->
         <scene sceneID="ZM1-8D-KkM">
             <objects>
-                <tabBarController id="WA4-bC-JUZ" sceneMemberID="viewController">
+                <tabBarController storyboardIdentifier="HomePageTabBar" id="WA4-bC-JUZ" sceneMemberID="viewController">
                     <navigationItem key="navigationItem" title="Welcome to Zentra" id="BJR-8Q-72Z"/>
                     <tabBar key="tabBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" barStyle="black" id="EYJ-9I-WYB">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="49"/>
@@ -451,8 +468,8 @@
                     <connections>
                         <segue destination="wjB-8V-GNY" kind="relationship" relationship="viewControllers" id="9hZ-xg-G8v"/>
                         <segue destination="XkA-qp-jps" kind="relationship" relationship="viewControllers" id="bRr-bT-8hf"/>
-                        <segue destination="lC5-3d-K6C" kind="relationship" relationship="viewControllers" id="Ke1-9m-JEh"/>
                         <segue destination="ZW7-ZX-RvL" kind="relationship" relationship="viewControllers" id="CkY-Fv-Blt"/>
+                        <segue destination="17l-kz-ix7" kind="relationship" relationship="viewControllers" id="QTT-QQ-bO9"/>
                         <segue destination="ZAE-fT-XRB" kind="relationship" relationship="viewControllers" id="yI2-Md-nM6"/>
                     </connections>
                 </tabBarController>
@@ -466,7 +483,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="Cte-55-Ttc" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="fu8-8o-oZl">
-                        <rect key="frame" x="0.0" y="118" width="393" height="44"/>
+                        <rect key="frame" x="0.0" y="118" width="393" height="54"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
@@ -483,25 +500,25 @@
         <image name="calendar" catalog="system" width="128" height="107"/>
         <image name="homekit" catalog="system" width="128" height="104"/>
         <image name="list.dash" catalog="system" width="128" height="85"/>
-        <image name="map" catalog="system" width="128" height="112"/>
+        <image name="map.fill" catalog="system" width="128" height="110"/>
         <image name="person.crop.circle" catalog="system" width="128" height="123"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
         <systemColor name="systemGrayColor">
-            <color red="0.55686274509803924" green="0.55686274509803924" blue="0.57647058823529407" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.5568627451" green="0.5568627451" blue="0.57647058819999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemIndigoColor">
-            <color red="0.34509803921568627" green="0.33725490196078434" blue="0.83921568627450982" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.34509803919999998" green="0.33725490200000002" blue="0.83921568629999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemMintColor">
-            <color red="0.0" green="0.7803921568627451" blue="0.74509803921568629" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.78039215689999997" blue="0.74509803919999995" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="systemTealColor">
-            <color red="0.18823529411764706" green="0.69019607843137254" blue="0.7803921568627451" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.18823529410000001" green="0.69019607839999997" blue="0.78039215689999997" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
         <systemColor name="tintColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>
