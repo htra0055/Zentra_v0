@@ -5,6 +5,10 @@
 //  Created by Evelyn Tran on 17/9/2025.
 //
 
+// TODO: Need a button for logout -> logout and go back to initial login, signup view
+// TODO: Need a button for reset -> clear the user selection (so they dont have to unselected all their option)
+// TODO: Need to cofigure storyboard for collection view (UI Images)
+
 import UIKit
 import CoreLocation
 
@@ -112,17 +116,32 @@ class VibeSelectionViewController: UIViewController  {
         let chosenActivities = selectedInterests.map { Activity(type: $0) }
         let plan = Plan(activities: chosenActivities, mood: energy, duration: duration)
         
-        print("Created Plan: \(plan)")
+//        print("Created Plan: \(plan)")
+//        
+//        if let tabBarController = self.tabBarController {
+//            if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+//               let planVC = navController.viewControllers.first as? PlanViewController {
+//                planVC.plan = plan
+//            } else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
+//                planVC.plan = plan
+//            }
+//            tabBarController.selectedIndex = 1
+//        }
         
-        if let tabBarController = self.tabBarController {
-            if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
-               let planVC = navController.viewControllers.first as? PlanViewController {
-                planVC.plan = plan
-            } else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
-                planVC.plan = plan
+        // Show notification to user
+        showAlert(title: "Your Plan is saved and ready!", message: "") {
+            // Pass plan to PlanViewController in tab bar
+            if let tabBarController = self.tabBarController {
+                if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                   let planVC = navController.viewControllers.first as? PlanViewController {
+                    planVC.plan = plan
+                } else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
+                    planVC.plan = plan
+                }
+                tabBarController.selectedIndex = 1
             }
-            tabBarController.selectedIndex = 1
         }
+        
     }
     
     // MARK: - Helpers
@@ -157,6 +176,17 @@ class VibeSelectionViewController: UIViewController  {
             }
         }
     }
+    
+    // MARK: show notification
+    func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
+        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
+            completion?()
+        })
+        present(alert, animated: true)
+    }
+
+    
 }
 
 
@@ -193,3 +223,4 @@ extension UIColor {
         return self
     }
 }
+
