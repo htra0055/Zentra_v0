@@ -11,39 +11,26 @@ import CoreLocation
 
 
 
-
-enum ActivityType: String, Codable {
-    case adventure = "Adventure"
-    case cultural = "Cultural"
-    case foodie = "Foodie"
-    case nightlife = "Nightlife"
-    case relaxation = "Relaxation"
-    case nature = "Nature"
+enum Activity: String, Codable {
+    case Adventure = "Adventure"
+    case Cultural = "Cultural"
+    case Foodie = "Foodie"
+    case Nightlife = "Nightlife"
+    case Relaxation = "Relaxation"
+    case Nature = "Nature"
 }
 
-struct Activity: Codable, Identifiable {
-    let id: UUID
-    let type: ActivityType
-    let description: String
-    
-    init(type: ActivityType, description: String = "") {
-        self.id = UUID()
-        self.type = type
-        self.description = description
+extension Activity {
+    var query: String {
+        switch self {
+        case .Adventure: return "hiking trails"
+        case .Cultural: return "museums"
+        case .Foodie: return "restaurants"
+        case .Nightlife: return "bars"
+        case .Relaxation: return "spas"
+        case .Nature: return "parks"
+        }
     }
 }
 
-// maybe later with API
-//struct Activity {
-//    let name: String
-//    let location: String
-//    let latitude: Double
-//    let longitude: Double
-//    let category: String
-//    let rating: Double?
-//    let photoURL: String?
-//
-//    //    var coordinate: CLLocationCoordinate2D {
-//    //        CLLocationCoordinate2D(latitude: lat, longitude: lon)
-//    //    }
-//}
+

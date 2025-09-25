@@ -11,6 +11,8 @@
 // TODO: advanced: connect to google account/gmail/other authentication.
 
 
+// TODO: coredata in activity, activities send to friebnd
+
 
 import UIKit
 import FirebaseAuth

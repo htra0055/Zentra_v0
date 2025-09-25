@@ -1,5 +1,5 @@
-
-
+//
+//
 ////
 ////  PlanCell.swift
 ////  zentra_v0
@@ -40,4 +40,4 @@
 //        // TODO: configure rating stars and image
 //    }
 //}
-
+//
