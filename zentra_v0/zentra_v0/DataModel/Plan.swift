@@ -11,7 +11,7 @@ import Foundation
 import CoreLocation
 
 
-struct Plan: Codable, Identifiable {
+struct Plan: Identifiable {
     let id: UUID
     let activities: [Activity]
     let mood: Mood

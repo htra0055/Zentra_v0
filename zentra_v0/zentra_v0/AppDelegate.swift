@@ -11,7 +11,7 @@ import FirebaseAuth
 import FirebaseFirestore
 import UIKit
 
-//import GooglePlaces
+import GooglePlaces
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -29,7 +29,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         databaseController = FirebaseController()
         
         // Google API
-     //   GMSPlacesClient.provideAPIKey("AIzaSyCo1nn7NPqkq75PSuilJCiWZo-5foDRtCk")
+        GMSPlacesClient.provideAPIKey("AIzaSyCo1nn7NPqkq75PSuilJCiWZo-5foDRtCk")
         
         return true
     }

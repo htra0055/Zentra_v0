@@ -9,13 +9,14 @@
 // TODO: Need a button for reset -> clear the user selection (so they dont have to unselected all their option)
 // TODO: Need to cofigure storyboard for collection view (UI Images)
 
+
 import UIKit
 import CoreLocation
 
-class VibeSelectionViewController: UIViewController  {
+class VibeSelectionViewController: UIViewController {
     
     // MARK: - User input
-    var selectedInterests: [ActivityType] = []
+    var selectedInterests: [Activity] = []
     var selectedEnergy: Mood?
     var selectedDuration: TripDuration?
     
@@ -33,7 +34,7 @@ class VibeSelectionViewController: UIViewController  {
     @IBOutlet weak var LowkeyButton: UIButton!
     @IBOutlet weak var BalancedButton: UIButton!
     @IBOutlet weak var HighenergyButton: UIButton!
-  
+    
     @IBOutlet weak var DurationSegment: UISegmentedControl!
     @IBOutlet weak var YourSelectionStackView: UIStackView!
     @IBOutlet weak var CreatePlanButton: UIButton!
@@ -41,8 +42,6 @@ class VibeSelectionViewController: UIViewController  {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        
         
         // Save default styles for all buttons
         let allButtons = [
@@ -60,16 +59,14 @@ class VibeSelectionViewController: UIViewController  {
             }
         }
         
-        
-        
         updateSelectionView()
     }
     
     // MARK: - Actions
     @IBAction func interestTapped(_ sender: UIButton) {
         guard let title = sender.title(for: .normal),
-              let type = ActivityType(rawValue: title) else { return }
-        
+              let type = Activity(rawValue: title) else { return }
+
         if selectedInterests.contains(type) {
             selectedInterests.removeAll { $0 == type }
             sender.restoreStyle(from: originalButtonStyles[sender])
@@ -77,7 +74,7 @@ class VibeSelectionViewController: UIViewController  {
             selectedInterests.append(type)
             sender.selectStyle()
         }
-        
+
         updateSelectionView()
     }
 
@@ -97,7 +94,6 @@ class VibeSelectionViewController: UIViewController  {
         updateSelectionView()
     }
 
-
     @IBAction func tripDurationChanged(_ sender: UISegmentedControl) {
         if let title = sender.titleForSegment(at: sender.selectedSegmentIndex),
            let duration = TripDuration(rawValue: title) {
@@ -113,20 +109,8 @@ class VibeSelectionViewController: UIViewController  {
             return
         }
         
-        let chosenActivities = selectedInterests.map { Activity(type: $0) }
+        let chosenActivities = selectedInterests
         let plan = Plan(activities: chosenActivities, mood: energy, duration: duration)
-        
-//        print("Created Plan: \(plan)")
-//        
-//        if let tabBarController = self.tabBarController {
-//            if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
-//               let planVC = navController.viewControllers.first as? PlanViewController {
-//                planVC.plan = plan
-//            } else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
-//                planVC.plan = plan
-//            }
-//            tabBarController.selectedIndex = 1
-//        }
         
         // Show notification to user
         showAlert(title: "Your Plan is saved and ready!", message: "") {
@@ -141,7 +125,6 @@ class VibeSelectionViewController: UIViewController  {
                 tabBarController.selectedIndex = 1
             }
         }
-        
     }
     
     // MARK: - Helpers
@@ -185,17 +168,11 @@ class VibeSelectionViewController: UIViewController  {
         })
         present(alert, animated: true)
     }
-
-    
 }
 
-
 // MARK: - UIButton styling
-
 extension UIButton {
-    
     func selectStyle() {
-        // Make the background color darker for higher contrast
         if let original = self.backgroundColor {
             self.backgroundColor = original.darker(by: 50)
         } else {
@@ -223,4 +200,3 @@ extension UIColor {
         return self
     }
 }
-
