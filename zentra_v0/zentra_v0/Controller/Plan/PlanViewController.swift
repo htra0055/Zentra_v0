@@ -110,6 +110,52 @@ class PlanViewController: UIViewController {
 
     
     // MARK: - Display Places
+    // v0
+//    private func displayPlaces(_ places: [GMSPlace]) {
+//        for place in places {
+//            let container = UIView()
+//            container.layer.cornerRadius = 12
+//            container.backgroundColor = .secondarySystemBackground
+//            container.translatesAutoresizingMaskIntoConstraints = false
+//            container.heightAnchor.constraint(equalToConstant: 250).isActive = true
+//
+//            let label = UILabel()
+//            label.numberOfLines = 2
+//            label.text = place.name
+//            label.font = .boldSystemFont(ofSize: 16)
+//
+//            container.addSubview(label)
+//            label.translatesAutoresizingMaskIntoConstraints = false
+//            NSLayoutConstraint.activate([
+//                label.topAnchor.constraint(equalTo: container.topAnchor, constant: 8),
+//                label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 8),
+//                label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -8)
+//            ])
+//
+//            // Fetch photo
+//            fetchPlacePhoto(for: place) { image in
+//                if let image = image {
+//                    let imageView = UIImageView(image: image)
+//                    imageView.contentMode = .scaleAspectFill
+//                    imageView.clipsToBounds = true
+//                    container.addSubview(imageView)
+//                    imageView.translatesAutoresizingMaskIntoConstraints = false
+//                    NSLayoutConstraint.activate([
+//                        imageView.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 8),
+//                        imageView.leadingAnchor.constraint(equalTo: container.leadingAnchor),
+//                        imageView.trailingAnchor.constraint(equalTo: container.trailingAnchor),
+//                        imageView.bottomAnchor.constraint(equalTo: container.bottomAnchor)
+//                    ])
+//                }
+//            }
+//
+//            contentStack.addArrangedSubview(container)
+//        }
+//    }
+
+
+
+
     // v1
     private func displayPlaces(_ places: [GMSPlace]) {
         self.displayedPlaces = places // <- store them here
