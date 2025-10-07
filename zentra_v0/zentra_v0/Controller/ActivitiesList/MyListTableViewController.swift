@@ -22,7 +22,7 @@ class MyListTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "My Activity Lists"
+        title = "Activities"
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CELL_LIST)
 
         navigationItem.rightBarButtonItems = [

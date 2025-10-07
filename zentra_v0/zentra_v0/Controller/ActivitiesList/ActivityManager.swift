@@ -8,6 +8,10 @@
 
 import Foundation
 import GooglePlaces
+import UIKit
+import MapKit
+
+
 
 // MARK: - Saved Activity Model
 struct SavedActivity: Identifiable, Codable {
@@ -112,10 +116,53 @@ class ActivityManager {
         saveLists()   // <-- use the existing saveLists() method
     }
 
-    
+    func saveMKMapItem(_ item: MKMapItem) {
+        let defaultListName = "Saved Activities"
+        
+        // Create default list if it doesn't exist
+        if !userLists.contains(where: { $0.name == defaultListName }) {
+            createList(name: defaultListName)
+        }
+        
+        guard let list = userLists.first(where: { $0.name == defaultListName }) else { return }
+        
+        let activity = SavedActivity(
+            name: item.name ?? "Unknown Place",
+            placeID: UUID().uuidString,
+            address: item.placemark.title ?? ""
+        )
+        
+        if let index = userLists.firstIndex(where: { $0.id == list.id }) {
+            userLists[index].activities.append(activity)
+            saveLists() // Persist changes
+        }
+    }
 
-
-
     
+}
+
+extension ActivityManager {
     
+    func addMKMapItemToList(_ item: MKMapItem, list: ActivityList) {
+        let activity = SavedActivity(
+            name: item.name ?? "Unknown Place",
+            placeID: UUID().uuidString, // or some unique identifier
+            address: item.placemark.title ?? ""
+        )
+        if let index = userLists.firstIndex(where: { $0.id == list.id }) {
+            userLists[index].activities.append(activity)
+            saveLists()
+        }
+    }
+    
+    func saveMKMapItemToDefaultList(_ item: MKMapItem) {
+        let defaultListName = "Saved Activities"
+        var list = userLists.first(where: { $0.name == defaultListName })
+        if list == nil {
+            list = createList(name: defaultListName)
+        }
+        if let list = list {
+            addMKMapItemToList(item, list: list)
+        }
+    }
 }
