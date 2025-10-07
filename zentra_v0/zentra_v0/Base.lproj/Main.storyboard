@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24127" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Cte-55-Ttc">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="24128" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="Cte-55-Ttc">
     <device id="retina6_12" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="24063"/>
@@ -96,16 +96,16 @@
             </objects>
             <point key="canvasLocation" x="5215" y="-289"/>
         </scene>
-        <!--My Activities-->
+        <!--My List-->
         <scene sceneID="UiU-25-sIK">
             <objects>
-                <tableViewController id="WvB-oe-L82" customClass="PlanTableViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="WvB-oe-L82" customClass="MyListTableViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="Pey-2d-xga">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="placeCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="placeCell" textLabel="Kar-Mc-2NG" detailTextLabel="KCF-1Y-yvO" style="IBUITableViewCellStyleSubtitle" id="yf8-fn-mYm">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="placeListCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="placeCell" textLabel="Kar-Mc-2NG" detailTextLabel="KCF-1Y-yvO" style="IBUITableViewCellStyleSubtitle" id="yf8-fn-mYm">
                                 <rect key="frame" x="0.0" y="50" width="393" height="55"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="yf8-fn-mYm" id="ZmA-YQ-Reh">
@@ -128,6 +128,9 @@
                                         </label>
                                     </subviews>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="I2m-CS-pWs" kind="show" identifier="showMyActivities" id="Ngy-XW-f0U"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -135,11 +138,15 @@
                             <outlet property="delegate" destination="WvB-oe-L82" id="JY1-UH-s7P"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="My Activities" id="f2x-2Q-Hcu">
-                        <barButtonItem key="leftBarButtonItem" style="plain" systemItem="save" id="uYv-pE-wab"/>
-                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="add" id="WeC-Dl-d79">
+                    <navigationItem key="navigationItem" title="My List" id="f2x-2Q-Hcu">
+                        <barButtonItem key="leftBarButtonItem" style="plain" systemItem="save" id="uYv-pE-wab">
                             <connections>
-                                <segue destination="lkP-6v-h3i" kind="show" id="vKx-AK-wrb"/>
+                                <action selector="SavedButton:" destination="WvB-oe-L82" id="Aa4-BA-nfK"/>
+                            </connections>
+                        </barButtonItem>
+                        <barButtonItem key="rightBarButtonItem" image="square.and.arrow.up" catalog="system" style="plain" id="WeC-Dl-d79">
+                            <connections>
+                                <action selector="SharedButton:" destination="WvB-oe-L82" id="t7m-cl-bN7"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
@@ -147,6 +154,51 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="xJh-xs-Dai" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="7434.3511450381675" y="1754.9295774647887"/>
+        </scene>
+        <!--My Activities-->
+        <scene sceneID="kf0-DB-FMN">
+            <objects>
+                <tableViewController storyboardIdentifier="MyActivityTableViewController" id="I2m-CS-pWs" customClass="MyActivityTableViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="1xf-Ry-2T2">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <prototypes>
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="placeListCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="AcitivityCell" textLabel="gKq-ug-gZ7" detailTextLabel="MN0-rE-Oom" style="IBUITableViewCellStyleSubtitle" id="6E6-hx-eGr">
+                                <rect key="frame" x="0.0" y="50" width="393" height="55"/>
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="6E6-hx-eGr" id="OLr-uS-WbM">
+                                    <rect key="frame" x="0.0" y="0.0" width="393" height="55"/>
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Title" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="gKq-ug-gZ7">
+                                            <rect key="frame" x="20.000000000000004" y="9.9999999999999982" width="36.333333333333336" height="20.333333333333332"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="boldSystem" pointSize="17"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="Subtitle" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="MN0-rE-Oom">
+                                            <rect key="frame" x="19.999999999999996" y="31.333333333333332" width="43.666666666666664" height="14.333333333333334"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="0.0"/>
+                                            <nil key="textColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="I2m-CS-pWs" id="kVW-Jn-1l3"/>
+                            <outlet property="delegate" destination="I2m-CS-pWs" id="9oZ-bP-wsv"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="My Activities" id="RuA-1d-ux6"/>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="OJL-A6-5dh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="7434" y="2702"/>
         </scene>
         <!--My Location-->
         <scene sceneID="kQP-aE-FiE">
@@ -205,16 +257,19 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hLw-Bs-uOg">
-                                <rect key="frame" x="24" y="409" width="344" height="38.333333333333314"/>
+                                <rect key="frame" x="24" y="408.33333333333331" width="344" height="38.333333333333314"/>
                                 <color key="tintColor" systemColor="systemBrownColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Edit Profile"/>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zui-L6-PZC">
-                                <rect key="frame" x="24" y="466.33333333333331" width="344" height="38.333333333333314"/>
+                                <rect key="frame" x="24" y="465.66666666666669" width="344" height="39"/>
                                 <color key="tintColor" red="0.55294120309999995" green="0.65098041299999998" blue="0.74117648599999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="tinted" title="Saved Activities"/>
+                                <buttonConfiguration key="configuration" style="tinted" title="Friend List"/>
+                                <connections>
+                                    <segue destination="lkP-6v-h3i" kind="show" id="O2W-By-MD9"/>
+                                </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xhI-vd-r0l">
                                 <rect key="frame" x="24" y="521.66666666666663" width="344" height="38.333333333333371"/>
@@ -227,7 +282,7 @@
                                 <color key="backgroundColor" red="0.1043634294" green="0.68714756249999998" blue="0.75073546170000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kyX-Zk-exU">
-                                <rect key="frame" x="26" y="308" width="340" height="51"/>
+                                <rect key="frame" x="26" y="308" width="340" height="50.333333333333314"/>
                                 <color key="backgroundColor" red="0.83137255909999996" green="0.6549019814" blue="0.63921570780000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="UserEmail@gmail.com" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cJu-cw-FqY">
@@ -863,16 +918,16 @@
             </objects>
             <point key="canvasLocation" x="1959.5419847328244" y="1754.9295774647887"/>
         </scene>
-        <!--Search Places-->
+        <!--Your Friend List-->
         <scene sceneID="Ylb-lO-aWY">
             <objects>
-                <tableViewController id="lkP-6v-h3i" customClass="SearchBooksTableViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="FriendListTableViewController" id="lkP-6v-h3i" customClass="FriendListTableViewController" customModule="zentra_v0" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" id="Jhx-T6-Pfh">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="bookCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="bookCell" textLabel="xFd-LC-bN7" detailTextLabel="TZR-ET-lVw" style="IBUITableViewCellStyleSubtitle" id="0Tp-G4-seI">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" restorationIdentifier="bookCell" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="bookCell" textLabel="xFd-LC-bN7" detailTextLabel="TZR-ET-lVw" style="IBUITableViewCellStyleSubtitle" id="0Tp-G4-seI" userLabel="friendCell">
                                 <rect key="frame" x="0.0" y="50" width="393" height="55"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="0Tp-G4-seI" id="YD6-eC-eG9">
@@ -902,11 +957,13 @@
                             <outlet property="delegate" destination="lkP-6v-h3i" id="5Fj-dg-Ytr"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Search Places" id="tkF-Az-ead"/>
+                    <navigationItem key="navigationItem" title="Your Friend List" customizationIdentifier="" id="tkF-Az-ead">
+                        <barButtonItem key="rightBarButtonItem" style="plain" systemItem="add" id="tXQ-FY-GLH"/>
+                    </navigationItem>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="IrG-Yj-zWu" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="7434" y="2479"/>
+            <point key="canvasLocation" x="10943" y="1548"/>
         </scene>
         <!--Explore-->
         <scene sceneID="lUY-Hm-Mq8">
@@ -930,7 +987,6 @@
         <!--Plan-->
         <scene sceneID="myh-xq-6LT">
             <objects>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="Jzy-du-C2W" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="1hs-RE-5m3" sceneMemberID="viewController">
                     <tabBarItem key="tabBarItem" title="Plan" image="calendar" catalog="system" id="NbZ-XA-I4P"/>
                     <toolbarItems/>
@@ -944,6 +1000,7 @@
                         <segue destination="hnD-y2-o2H" kind="relationship" relationship="rootViewController" id="NLU-jD-tRN"/>
                     </connections>
                 </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Jzy-du-C2W" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="1032.824427480916" y="1754.9295774647887"/>
         </scene>
@@ -973,6 +1030,7 @@
         <image name="list.bullet" catalog="system" width="128" height="87"/>
         <image name="map.fill" catalog="system" width="128" height="110"/>
         <image name="person.crop.circle" catalog="system" width="128" height="123"/>
+        <image name="square.and.arrow.up" catalog="system" width="110" height="128"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
