@@ -240,6 +240,8 @@ extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
         alert.addAction(UIAlertAction(title: "Close", style: .cancel))
         present(alert, animated: true)
     }
+    
+    
 }
 
 // MARK: - MKMapViewDelegate

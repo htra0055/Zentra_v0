@@ -12,9 +12,9 @@ import GooglePlacesSwift
 import SwiftUI
 import CoreLocation
 
-class PlanTableViewController: UITableViewController {
+class MyListTableViewController: UITableViewController {
 
-    let CELL_PLACE = "placeCell"
+    let CELL_PLACE = "placeListCell"
 
     var plan: Plan?
     var places: [GMSPlace] = [] // Fetched places
@@ -27,9 +27,78 @@ class PlanTableViewController: UITableViewController {
         tableView.rowHeight = UITableView.automaticDimension
         tableView.estimatedRowHeight = 180
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: CELL_PLACE)
+        // Add Saved and Shared buttons
+//        navigationItem.rightBarButtonItems = [
+//            UIBarButtonItem(title: "Saved", style: .plain, target: self, action: #selector(saveActivities)),
+//            UIBarButtonItem(title: "Shared", style: .plain, target: self, action: #selector(shareActivities))
+//        ]
 
         loadPlaces()
     }
+    
+    
+    
+    
+    @objc private func saveActivities() {
+        guard !places.isEmpty else { return }
+
+        // Example: save to ActivityManager
+        ActivityManager.shared.saveActivities(places: places)
+
+        let alert = UIAlertController(title: "Saved", message: "Your activities have been saved.", preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "OK", style: .default))
+        present(alert, animated: true)
+    }
+
+    @IBAction func SavedButton(_ sender: Any) {
+        saveActivities()
+    }
+    
+    
+    @IBAction func SharedButton(_ sender: Any) {
+        shareActivities()
+    }
+    
+    
+    @objc private func shareActivities() {
+        guard !places.isEmpty else { return }
+
+        let alert = UIAlertController(title: "Share Activities", message: "Choose how to share", preferredStyle: .actionSheet)
+
+        // Option 1: Share to friends
+        alert.addAction(UIAlertAction(title: "Share with Friends", style: .default, handler: { _ in
+            self.shareToFriends()
+        }))
+
+        // Option 2: AirDrop
+        alert.addAction(UIAlertAction(title: "Share via AirDrop", style: .default, handler: { _ in
+            self.shareViaAirDrop()
+        }))
+
+        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
+        present(alert, animated: true)
+    }
+    
+    private func shareToFriends() {
+        let friendListVC = FriendListTableViewController()
+        friendListVC.activitiesToShare = places
+        navigationController?.pushViewController(friendListVC, animated: true)
+    }
+
+    
+    
+    private func shareViaAirDrop() {
+        // Convert activities into something shareable (e.g., array of names)
+        let placeNames = places.compactMap { $0.name }
+        let activityText = placeNames.joined(separator: "\n")
+
+        let activityVC = UIActivityViewController(activityItems: [activityText], applicationActivities: nil)
+        activityVC.excludedActivityTypes = [.postToFacebook, .postToTwitter] // optional
+        present(activityVC, animated: true)
+    }
+
+
 
     // MARK: - Load Places
     func loadPlaces() {
