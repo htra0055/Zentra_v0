@@ -23,12 +23,12 @@ enum Activity: String, Codable {
 extension Activity {
     var query: String {
         switch self {
-        case .Adventure: return "hiking trails"
-        case .Cultural: return "museums"
-        case .Foodie: return "restaurants"
-        case .Nightlife: return "bars"
-        case .Relaxation: return "spas"
-        case .Nature: return "parks"
+        case .Adventure: return "Adventure" // "hiking trails, camping"
+        case .Cultural: return "Cultural" // "museums, art galleries, historic sites"
+        case .Foodie: return "Foodie" // "restaurants, cafes, street food"
+        case .Nightlife: return "Nightlife" // "bars, live music venues" //, clubs, live music venues"
+        case .Relaxation: return "Relaxation" // "spas, yoga studios" //, wellness centers
+        case .Nature: return "Nature"  //"parks, beaches, forests, nature reserves"
         }
     }
 }

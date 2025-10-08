@@ -22,17 +22,29 @@
 		7BE6ED982E7A7F1F002779C8 /* Exceptions for "zentra_v0" folder in "zentra_v0" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Controller/VibeSelection/VibeSelectionViewController_v0.swift,
 				Info.plist,
 			);
 			target = 7BE6ED852E7A7F1E002779C8 /* zentra_v0 */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		7B65B7732E95F7730088842C /* Exceptions for "zentra_v0" folder in "Copy Bundle Resources" phase from "zentra_v0" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = 7BE6ED842E7A7F1E002779C8 /* Resources */;
+			membershipExceptions = (
+				Controller/VibeSelection/VibeSelectionViewController_v0.swift,
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		7BE6ED882E7A7F1E002779C8 /* zentra_v0 */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				7BE6ED982E7A7F1F002779C8 /* Exceptions for "zentra_v0" folder in "zentra_v0" target */,
+				7B65B7732E95F7730088842C /* Exceptions for "zentra_v0" folder in "Copy Bundle Resources" phase from "zentra_v0" target */,
 			);
 			path = zentra_v0;
 			sourceTree = "<group>";

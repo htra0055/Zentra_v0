@@ -899,14 +899,23 @@
                                 <viewLayoutGuide key="contentLayoutGuide" id="Jjf-5z-Fvn"/>
                                 <viewLayoutGuide key="frameLayoutGuide" id="fyQ-H6-spZ"/>
                             </scrollView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Places your vibe will love!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KmM-QS-lL6">
+                                <rect key="frame" x="100" y="172" width="193" height="20"/>
+                                <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="16"/>
+                                <color key="textColor" systemColor="systemGrayColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="mEh-QY-o3T"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="T0Y-YW-lmH" firstAttribute="leading" secondItem="mEh-QY-o3T" secondAttribute="leading" constant="30" id="43s-kL-XKb"/>
+                            <constraint firstItem="T0Y-YW-lmH" firstAttribute="top" secondItem="KmM-QS-lL6" secondAttribute="bottom" constant="46" id="7Pl-JM-68f"/>
+                            <constraint firstItem="KmM-QS-lL6" firstAttribute="top" secondItem="mEh-QY-o3T" secondAttribute="top" id="FFz-yR-hXU"/>
                             <constraint firstItem="mEh-QY-o3T" firstAttribute="bottom" secondItem="T0Y-YW-lmH" secondAttribute="bottom" constant="12" id="GOY-lR-c4i"/>
                             <constraint firstItem="T0Y-YW-lmH" firstAttribute="top" secondItem="mEh-QY-o3T" secondAttribute="top" constant="66" id="HFN-Ns-HTj"/>
                             <constraint firstItem="mEh-QY-o3T" firstAttribute="trailing" secondItem="T0Y-YW-lmH" secondAttribute="trailing" constant="26" id="LOe-dG-gdq"/>
+                            <constraint firstItem="KmM-QS-lL6" firstAttribute="leading" secondItem="mEh-QY-o3T" secondAttribute="leading" constant="100" id="did-ij-x9J"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" title="Zentra Planner" id="411-X9-m5P"/>

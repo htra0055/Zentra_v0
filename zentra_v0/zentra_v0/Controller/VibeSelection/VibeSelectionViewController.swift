@@ -10,8 +10,10 @@
 // TODO: Need to cofigure storyboard for collection view (UI Images)
 
 
-import UIKit
+import Foundation
 import CoreLocation
+import GooglePlaces
+import UIKit
 
 class VibeSelectionViewController: UIViewController {
     
@@ -19,6 +21,45 @@ class VibeSelectionViewController: UIViewController {
     var selectedInterests: [Activity] = []
     var selectedEnergy: Mood?
     var selectedDuration: TripDuration?
+    
+    // TODO: Location: get from text input or nil
+    // MARK: - Location Handling
+
+    
+    private let locationManager = CLLocationManager()
+       
+    // store the geocoded coordinate once resolved
+    private var resolvedCoordinate: CLLocationCoordinate2D?
+    private let userInputAddress: String? = "Melbourne"
+
+    // Computed fallback order
+    var searchLocation: CLLocationCoordinate2D {
+        if let resolved = resolvedCoordinate {
+            return resolved
+        } else if let current = locationManager.location?.coordinate {
+            return current
+        } else {
+            return CLLocationCoordinate2D(latitude: -37.8150309, longitude: 144.9663466)
+        }
+    }
+
+
+
+//    var searchLocation: CLLocationCoordinate2D {
+//        // Use user input if available
+//        if let userInput = userInput {
+//            return userInput
+//        }
+//        // Use device location if available
+//        if let current = locationManager.location?.coordinate {
+//            return current
+//        }
+//        // Fallback to default placeholder (0,0)
+//        return CLLocationCoordinate2D(latitude: 0, longitude: 0)
+//    }
+
+
+
     
     // Store original button styles
     private var originalButtonStyles: [UIButton: (bgColor: UIColor?, titleColor: UIColor?)] = [:]
@@ -58,6 +99,21 @@ class VibeSelectionViewController: UIViewController {
                 )
             }
         }
+        
+
+         // Location setup
+        locationManager.delegate = self
+        locationManager.requestWhenInUseAuthorization()
+        locationManager.startUpdatingLocation()
+
+        if let address = userInputAddress {
+            getCoordinates(for: address) { [weak self] coordinate in guard let self = self else { return }
+            self.resolvedCoordinate = coordinate
+            print("Resolved user input to coordinate: \(String(describing: coordinate))")
+                }
+            }
+
+
         
         updateSelectionView()
     }
@@ -101,31 +157,83 @@ class VibeSelectionViewController: UIViewController {
         }
         updateSelectionView()
     }
-
-    @IBAction func createPlanTapped(_ sender: UIButton) {
-        guard let energy = selectedEnergy,
-              let duration = selectedDuration else {
-            print("Please complete all selections")
-            return
-        }
-        
-        let chosenActivities = selectedInterests
-        let plan = Plan(activities: chosenActivities, mood: energy, duration: duration)
-        
-        // Show notification to user
-        showAlert(title: "Your Plan is saved and ready!", message: "") {
-            // Pass plan to PlanViewController in tab bar
-            if let tabBarController = self.tabBarController {
-                if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
-                   let planVC = navController.viewControllers.first as? PlanViewController {
-                    planVC.plan = plan
-                } else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
-                    planVC.plan = plan
-                }
-                tabBarController.selectedIndex = 1
+    
+    // convert string (location) to coordinates
+    func getCoordinates(for address: String, completion: @escaping (CLLocationCoordinate2D?) -> Void) {
+        let geocoder = CLGeocoder()
+        geocoder.geocodeAddressString(address) { placemarks, error in
+            if let error = error {
+                print("Geocoding error: \(error.localizedDescription)")
+                completion(nil)
+                return
+            }
+            if let location = placemarks?.first?.location {
+                completion(location.coordinate)
+            } else {
+                completion(nil)
             }
         }
     }
+    // v1
+    @IBAction func createPlanTapped(_ sender: UIButton) {
+        guard let energy = selectedEnergy,
+              let duration = selectedDuration else {
+            showAlert(title: "Incomplete Selection", message: "Please complete all selections before creating a plan.")
+            return
+        }
+
+        let plan = Plan(activities: selectedInterests, mood: energy, duration: duration, userCoordinate: resolvedCoordinate)
+
+        // Handle both cases: resolved or not yet resolved
+        if let address = userInputAddress, resolvedCoordinate == nil {
+            showAlert(title: "Loading Location", message: "Please wait while we locate \"\(address)\".")
+            getCoordinates(for: address) { [weak self] coordinate in
+                guard let self = self else { return }
+                self.resolvedCoordinate = coordinate
+                self.runSearchEngine(with: plan)
+            }
+        } else {
+            runSearchEngine(with: plan)
+        }
+    }
+
+    
+    // to resolve search location
+    private func runSearchEngine(with plan: Plan) {
+        let location = searchLocation
+        print("Running search with coordinates: \(location.latitude), \(location.longitude)")
+
+        FindPlaceEngine.shared.findPlaces(for: plan, userInputLocation: location) { result in
+            switch result {
+            case .success(let places):
+                print("Found \(places.count) places")
+                DispatchQueue.main.async {
+                    self.showAlert(title: "Your Plan is saved and ready!", message: "") {
+                        if let tabBarController = self.tabBarController {
+                            if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                               let planVC = navController.viewControllers.first as? PlanViewController {
+                                planVC.plan = plan
+                            } else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
+                                planVC.plan = plan
+                            }
+                            tabBarController.selectedIndex = 1
+                        }
+                    }
+                }
+
+            case .failure(let error):
+                print("Error: \(error)")
+                DispatchQueue.main.async {
+                    self.showAlert(title: "Error", message: "Could not find places: \(error.localizedDescription)")
+                }
+            }
+        }
+    }
+
+
+
+
+    
     
     // MARK: - Helpers
     func updateSelectionView() {
@@ -198,5 +306,20 @@ extension UIColor {
                            alpha: a)
         }
         return self
+    }
+}
+
+// Ask for permission
+extension VibeSelectionViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        // Stop updates to save battery
+        manager.stopUpdatingLocation()
+        print("Current location updated: \(locations.last?.coordinate)")
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        if status == .authorizedWhenInUse || status == .authorizedAlways {
+            print("Location access granted")
+        }
     }
 }

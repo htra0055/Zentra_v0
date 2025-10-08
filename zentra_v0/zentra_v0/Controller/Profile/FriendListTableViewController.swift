@@ -30,13 +30,13 @@ class FriendListTableViewController: UITableViewController {
 
         loadFriends()
 
-        // Share button on the right
+  
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share",
                                                             style: .done,
                                                             target: self,
                                                             action: #selector(shareButtonTapped))
         
-        // Add Friend button on the right (optional: can be left if desired)
+    
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                            target: self,
                                                            action: #selector(addFriendTapped))
