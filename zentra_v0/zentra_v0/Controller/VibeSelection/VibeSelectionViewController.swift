@@ -5,10 +5,9 @@
 //  Created by Evelyn Tran on 17/9/2025.
 //
 
-// TODO: Need a button for logout -> logout and go back to initial login, signup view
 // TODO: Need a button for reset -> clear the user selection (so they dont have to unselected all their option)
 // TODO: Need to cofigure storyboard for collection view (UI Images)
-
+// TODO: need to add notification, reminder, my activities (get more details, date added), maps: get navigation straight on explore map., working on fire database
 
 import Foundation
 import CoreLocation
@@ -42,24 +41,6 @@ class VibeSelectionViewController: UIViewController {
             return CLLocationCoordinate2D(latitude: -37.8150309, longitude: 144.9663466)
         }
     }
-
-
-
-//    var searchLocation: CLLocationCoordinate2D {
-//        // Use user input if available
-//        if let userInput = userInput {
-//            return userInput
-//        }
-//        // Use device location if available
-//        if let current = locationManager.location?.coordinate {
-//            return current
-//        }
-//        // Fallback to default placeholder (0,0)
-//        return CLLocationCoordinate2D(latitude: 0, longitude: 0)
-//    }
-
-
-
     
     // Store original button styles
     private var originalButtonStyles: [UIButton: (bgColor: UIColor?, titleColor: UIColor?)] = [:]

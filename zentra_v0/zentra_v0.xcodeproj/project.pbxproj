@@ -184,6 +184,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = zentra_v0/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Zentra;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Zentra needs access to your locaton at all times";
+				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "To share, nearby interaction is required";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
@@ -213,6 +216,9 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = zentra_v0/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = Zentra;
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "Zentra needs access to your locaton at all times";
+				INFOPLIST_KEY_NSNearbyInteractionAllowOnceUsageDescription = "";
+				INFOPLIST_KEY_NSNearbyInteractionUsageDescription = "To share, nearby interaction is required";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
