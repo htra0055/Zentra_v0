@@ -157,12 +157,81 @@ extension ActivityManager {
     
     func saveMKMapItemToDefaultList(_ item: MKMapItem) {
         let defaultListName = "Saved Activities"
-        var list = userLists.first(where: { $0.name == defaultListName })
-        if list == nil {
-            list = createList(name: defaultListName)
-        }
-        if let list = list {
+        if let list = userLists.first(where: { $0.name == defaultListName }) {
+            addMKMapItemToList(item, list: list)
+        } else {
+            let list = createList(name: defaultListName)
             addMKMapItemToList(item, list: list)
         }
+    }
+}
+
+// MARK: - Firestore Conversion & Sync
+extension ActivityManager {
+
+    // Convert local ActivityList -> FirestoreActivityList
+    func convertToFirestore(_ list: ActivityList, sharedFromUID: String? = nil) -> FirestoreActivityList {
+        let currentUID = Auth.auth().currentUser?.uid ?? list.id.uuidString
+        let firestoreActivities = list.activities.map {
+            FirestoreActivityItem(name: $0.name, placeID: $0.placeID, address: $0.address, type: nil)
+        }
+        return FirestoreActivityList(
+            from: <#[String : Any]#>, id: UUID().uuidString,
+            name: list.name,
+            ownerUID: currentUID,
+            sharedFromUID: sharedFromUID,
+            timestamp: Date(),
+            activities: firestoreActivities
+        ) ?? <#default value#>
+    }
+
+    // Convert FirestoreActivityList -> local ActivityList
+    func convertToLocal(_ firestoreList: FirestoreActivityList) -> ActivityList {
+        let activities = firestoreList.activities.map {
+            SavedActivity(name: $0.name, placeID: $0.placeID, address: $0.address)
+        }
+        return ActivityList(name: firestoreList.name, activities: activities)
+    }
+
+    // Save list to Firestore
+    func saveListToFirestore(_ list: ActivityList, sharedFromUID: String? = nil, completion: ((Error?) -> Void)? = nil) {
+        guard let currentUID = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        let firestoreList = convertToFirestore(list, sharedFromUID: sharedFromUID)
+
+        db.collection("users").document(currentUID)
+            .collection("activityLists").document(firestoreList.id)
+            .setData(firestoreList.toDict()) { error in
+                completion?(error)
+            }
+    }
+
+    // Fetch user lists from Firestore
+    func fetchUserListsFromFirestore(completion: @escaping ([FirestoreActivityList]) -> Void) {
+        guard let currentUID = Auth.auth().currentUser?.uid else { completion([]); return }
+        let db = Firestore.firestore()
+
+        db.collection("users").document(currentUID)
+            .collection("activityLists")
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                guard let docs = snapshot?.documents else { completion([]); return }
+                let lists = docs.compactMap { FirestoreActivityList(from: $0.data(), id: $0.documentID) }
+                completion(lists)
+            }
+    }
+
+    // Add a shared list to the user
+    func addSharedListToUser(_ sharedList: FirestoreActivityList, completion: ((Error?) -> Void)? = nil) {
+        guard let currentUID = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        var listDict = sharedList.toDict()
+        listDict["sharedFromUID"] = sharedList.ownerUID
+
+        db.collection("users").document(currentUID)
+            .collection("activityLists").document()
+            .setData(listDict) { error in
+                completion?(error)
+            }
     }
 }
