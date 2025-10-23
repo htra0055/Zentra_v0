@@ -139,11 +139,6 @@
                         </connections>
                     </tableView>
                     <navigationItem key="navigationItem" title="My List" id="f2x-2Q-Hcu">
-                        <barButtonItem key="leftBarButtonItem" style="plain" systemItem="save" id="uYv-pE-wab">
-                            <connections>
-                                <action selector="SavedButton:" destination="WvB-oe-L82" id="Aa4-BA-nfK"/>
-                            </connections>
-                        </barButtonItem>
                         <barButtonItem key="rightBarButtonItem" image="square.and.arrow.up" catalog="system" style="plain" id="WeC-Dl-d79">
                             <connections>
                                 <action selector="SharedButton:" destination="WvB-oe-L82" id="t7m-cl-bN7"/>

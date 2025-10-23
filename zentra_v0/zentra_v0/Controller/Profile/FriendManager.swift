@@ -5,39 +5,6 @@
 //  Created by Evelyn Tran on 7/10/2025.
 //
 
-
-import Foundation
-import GooglePlaces
-
-//class FriendManager {
-//    static let shared = FriendManager()
-//
-//    private var friends: [String] = ["alice@example.com", "bob@example.com", "carol@example.com"]
-//    private var sharedActivities: [String: [GMSPlace]] = [:] // friendEmail : activities
-//
-//    func getFriends() -> [String] {
-//        return friends
-//    }
-//
-//    func addFriend(_ email: String) {
-//        guard !friends.contains(email) else { return }
-//        friends.append(email)
-//    }
-//
-//    func shareActivities(_ activities: [GMSPlace], with friend: String) {
-//        if sharedActivities[friend] == nil {
-//            sharedActivities[friend] = []
-//        }
-//        sharedActivities[friend]?.append(contentsOf: activities)
-//        print("Shared \(activities.count) activities with \(friend)")
-//    }
-//
-//    func getSharedActivities(for friend: String) -> [GMSPlace] {
-//        return sharedActivities[friend] ?? []
-//    }
-//}
-
-
 import FirebaseFirestore
 import FirebaseAuth
 
@@ -47,24 +14,47 @@ class FriendManager {
     private init() {}
     
     func shareActivities(_ activities: [MockPlace], with friend: User) {
-        let db = Firestore.firestore() // <- initialize Firestore
+        let db = Firestore.firestore()
         
-        // Convert activities into a dictionary array
         let activitiesData = activities.map { ["name": $0.name, "address": $0.address] }
         
-        db.collection("users")
-          .document(friend.id) // friend’s user ID in Firestore
-          .collection("sharedActivities")
-          .addDocument(data: [
-              "fromUserId": Auth.auth().currentUser?.uid ?? "",
-              "activities": activitiesData,
-              "timestamp": Timestamp()
-          ]) { error in
-              if let error = error {
-                  print("Error sharing activities: \(error.localizedDescription)")
-              } else {
-                  print("Activities shared successfully with \(friend.name)")
-              }
-          }
+        let usersRef = db.collection("users")
+        
+        // Determine which field to query
+        let query: Query
+        if let userID = friend.userID, !userID.isEmpty {
+            query = usersRef.whereField("userID", isEqualTo: userID)
+        } else if friend.email.contains("@") {
+            query = usersRef.whereField("email", isEqualTo: friend.email)
+        } else {
+            query = usersRef.whereField("uid", isEqualTo: friend.uid)
+        }
+        
+        query.getDocuments { snapshot, error in
+            if let error = error {
+                print("Error finding friend document: \(error.localizedDescription)")
+                return
+            }
+            
+            guard let doc = snapshot?.documents.first else {
+                print("Friend not found in Firestore")
+                return
+            }
+            
+            usersRef.document(doc.documentID)
+                .collection("sharedActivities")
+                .addDocument(data: [
+                    "fromUserId": Auth.auth().currentUser?.uid ?? "",
+                    "activities": activitiesData,
+                    "timestamp": Timestamp()
+                ]) { error in
+                    if let error = error {
+                        print("Error sharing activities: \(error.localizedDescription)")
+                    } else {
+                        print("Activities shared successfully with \(friend.name ?? "Unknown")")
+                    }
+                }
+        }
     }
+
 }

@@ -6,7 +6,31 @@
 //
 
 
-struct User {
-    let id: String      // Firebase UID
-    let name: String    // Display name
+import Foundation
+
+struct User: Codable {
+    let uid: String          // Firebase Auth UID
+    let email: String
+    var name: String?
+    var userID: String?
+    
+    // Initialize from Firestore data dictionary
+    init?(from data: [String: Any]) {
+        guard let uid = data["uid"] as? String,
+              let email = data["email"] as? String else {
+            return nil
+        }
+        self.uid = uid
+        self.email = email
+        self.name = data["name"] as? String
+        self.userID = data["userID"] as? String
+    }
+
+    // Initialize directly
+    init(uid: String, email: String, name: String? = nil, userID: String? = nil) {
+        self.uid = uid
+        self.email = email
+        self.name = name
+        self.userID = userID
+    }
 }

@@ -5,14 +5,11 @@
 //  Created by Evelyn Tran on 7/10/2025.
 //
 
-
 import UIKit
 import GooglePlaces
 import FirebaseFirestore
 import FirebaseAuth
 
-
-// v1
 class FriendListTableViewController: UITableViewController {
 
     var friends: [User] = []
@@ -30,13 +27,11 @@ class FriendListTableViewController: UITableViewController {
 
         loadFriends()
 
-  
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Share",
                                                             style: .done,
                                                             target: self,
                                                             action: #selector(shareButtonTapped))
-        
-    
+
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                            target: self,
                                                            action: #selector(addFriendTapped))
@@ -58,71 +53,153 @@ class FriendListTableViewController: UITableViewController {
     // MARK: - Add Friend
     @objc private func addFriendTapped() {
         let alert = UIAlertController(title: "Add Friend",
-                                      message: "Enter email of the user to add",
+                                      message: "Enter the user's email or user ID",
                                       preferredStyle: .alert)
-        alert.addTextField { $0.placeholder = "User email"; $0.keyboardType = .emailAddress }
+        alert.addTextField { $0.placeholder = "Email or User ID"; $0.keyboardType = .emailAddress }
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         alert.addAction(UIAlertAction(title: "Add", style: .default, handler: { _ in
-            guard let email = alert.textFields?.first?.text?.lowercased(), !email.isEmpty else { return }
-            self.addFriend(withEmail: email)
+            guard let identifier = alert.textFields?.first?.text?.lowercased(), !identifier.isEmpty else { return }
+            self.addFriend(withIdentifier: identifier)
         }))
         present(alert, animated: true)
     }
 
-    private func addFriend(withEmail email: String) {
+    private func addFriend(withIdentifier identifier: String) {
         guard let currentUID = Auth.auth().currentUser?.uid else { return }
-        db.collection("users").whereField("email", isEqualTo: email).getDocuments { snapshot, error in
-            if let error = error { print("Error: \(error.localizedDescription)"); return }
-            guard let doc = snapshot?.documents.first, let name = doc.data()["name"] as? String else {
+
+        // Determine whether to query by email or userID
+        let queryField: String = identifier.contains("@") ? "email" : "userID"
+
+        db.collection("users").whereField(queryField, isEqualTo: identifier).getDocuments { snapshot, error in
+            if let error = error {
+                print("Error fetching user: \(error.localizedDescription)")
+                self.showAlert(title: "Error", message: "Failed to fetch user")
+                return
+            }
+
+            guard let doc = snapshot?.documents.first else {
                 self.showAlert(title: "Error", message: "User not found")
                 return
             }
-            let newFriend = User(id: email, name: name)
-            if self.friends.contains(where: { $0.id == email }) {
+
+            let data = doc.data()
+
+            // Safely extract fields with fallback values
+            let uid = data["uid"] as? String ?? doc.documentID
+            let email = data["email"] as? String ?? "Unknown Email"
+            let name = data["name"] as? String ?? email
+            let userID = data["userID"] as? String
+
+            let newFriend = User(uid: uid, email: email, name: name, userID: userID)
+
+            // Check if already added
+            if self.friends.contains(where: { $0.uid == newFriend.uid }) {
                 self.showAlert(title: "Info", message: "Friend already added")
                 return
             }
+
+            // Update current user's friends array in Firestore
             let currentUserRef = self.db.collection("users").document(currentUID)
-            currentUserRef.updateData(["friends": FieldValue.arrayUnion([email])]) { error in
-                if let error = error { print("Error updating friends: \(error.localizedDescription)"); return }
-                self.friends.append(newFriend)
-                DispatchQueue.main.async { self.tableView.reloadData() }
+            currentUserRef.updateData(["friends": FieldValue.arrayUnion([newFriend.uid])]) { error in
+                if let error = error {
+                    print("Error updating friends: \(error.localizedDescription)")
+                    return
+                }
+
+                // Append new friend and reload table on main thread
+                DispatchQueue.main.async {
+                    self.friends.append(newFriend)
+                    self.tableView.reloadData()
+                }
             }
         }
     }
 
     
+
+
+    // MARK: - Alert helper
     private func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
-            completion?()
-        }))
+        alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in completion?() }))
         present(alert, animated: true)
     }
-
 
     // MARK: - TableView DataSource & Delegate
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { friends.count }
 
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "friendCell", for: indexPath)
+//        let friend = friends[indexPath.row]
+//        cell.textLabel?.text = friend.name ?? friend.email
+//        cell.accessoryType = selectedFriends.contains(where: { $0.uid == friend.uid }) ? .checkmark : .none
+//        return cell
+//    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "friendCell", for: indexPath)
         let friend = friends[indexPath.row]
-        cell.textLabel?.text = friend.name
-        cell.accessoryType = selectedFriends.contains(where: { $0.id == friend.id }) ? .checkmark : .none
+
+        // Ensure there is always a visible title
+        if let name = friend.name, !name.isEmpty {
+            cell.textLabel?.text = name
+        } else if !friend.email.isEmpty {
+            cell.textLabel?.text = friend.email
+        } else {
+            cell.textLabel?.text = "Unknown User"
+        }
+
+        cell.accessoryType = selectedFriends.contains(where: { $0.uid == friend.uid }) ? .checkmark : .none
         return cell
     }
 
+
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let friend = friends[indexPath.row]
-        if !selectedFriends.contains(where: { $0.id == friend.id }) { selectedFriends.append(friend) }
+        if !selectedFriends.contains(where: { $0.uid == friend.uid }) {
+            selectedFriends.append(friend)
+        }
         tableView.reloadRows(at: [indexPath], with: .automatic)
     }
 
     override func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
         let friend = friends[indexPath.row]
-        selectedFriends.removeAll { $0.id == friend.id }
+        selectedFriends.removeAll { $0.uid == friend.uid }
         tableView.reloadRows(at: [indexPath], with: .automatic)
     }
+    
+    // Enable swipe-to-delete
+    override func tableView(_ tableView: UITableView,
+                            commit editingStyle: UITableViewCell.EditingStyle,
+                            forRowAt indexPath: IndexPath) {
+        if editingStyle == .delete {
+            let friendToRemove = friends[indexPath.row]
+
+            // Remove from Firestore current user's friends array
+            guard let currentUID = Auth.auth().currentUser?.uid else { return }
+            let currentUserRef = db.collection("users").document(currentUID)
+            currentUserRef.updateData(["friends": FieldValue.arrayRemove([friendToRemove.uid])]) { error in
+                if let error = error {
+                    print("Error removing friend: \(error.localizedDescription)")
+                    self.showAlert(title: "Error", message: "Failed to remove friend")
+                    return
+                }
+
+                // Remove locally and update table view
+                DispatchQueue.main.async {
+                    self.friends.remove(at: indexPath.row)
+                    tableView.deleteRows(at: [indexPath], with: .automatic)
+                }
+            }
+        }
+    }
+
+    // Optional: customize the swipe delete button title
+    override func tableView(_ tableView: UITableView,
+                            titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
+        return "Remove"
+    }
+
 
     // MARK: - Share
     @objc private func shareButtonTapped() {
@@ -130,59 +207,61 @@ class FriendListTableViewController: UITableViewController {
             showAlert(title: "Error", message: "Select friends and activities to share")
             return
         }
+
         for friend in selectedFriends { shareActivities(with: friend) }
+
         showAlert(title: "Success", message: "Activities shared!") {
             self.navigationController?.popViewController(animated: true)
         }
     }
 
     private func shareActivities(with friend: User) {
-        let activitiesData = activitiesToShare.map { ["placeID": $0.name, "name": $0.name, "address": $0.address] }
-        db.collection("users").whereField("email", isEqualTo: friend.id).getDocuments { snapshot, error in
-            guard let doc = snapshot?.documents.first else { return }
-            self.db.collection("users").document(doc.documentID).collection("sharedActivities").addDocument(data: [
-                "fromUserId": Auth.auth().currentUser?.uid ?? "",
-                "activities": activitiesData,
-                "timestamp": Timestamp()
-            ])
+        let activitiesData = activitiesToShare.map { ["name": $0.name, "address": $0.address] }
+
+        db.collection("users").document(friend.uid).collection("sharedActivities").addDocument(data: [
+            "fromUserId": Auth.auth().currentUser?.uid ?? "",
+            "activities": activitiesData,
+            "timestamp": Timestamp()
+        ]) { error in
+            if let error = error {
+                print("Error sharing activities: \(error.localizedDescription)")
+            }
         }
     }
-    
+
     // MARK: - Load Friends
     private func loadFriends() {
         guard let currentUID = Auth.auth().currentUser?.uid else { return }
-        
+
         db.collection("users").document(currentUID).getDocument { snapshot, error in
             if let error = error {
                 print("Error fetching current user: \(error.localizedDescription)")
                 return
             }
-            
-            guard let data = snapshot?.data(), let friendEmails = data["friends"] as? [String] else {
+
+            guard let data = snapshot?.data(), let friendUIDs = data["friends"] as? [String] else {
                 self.friends = []
                 self.tableView.reloadData()
                 return
             }
-            
+
             let group = DispatchGroup()
             var fetchedFriends: [User] = []
-            
-            for email in friendEmails {
+
+            for uid in friendUIDs {
                 group.enter()
-                self.db.collection("users").whereField("email", isEqualTo: email).getDocuments { snap, error in
+                self.db.collection("users").document(uid).getDocument { doc, error in
                     defer { group.leave() }
-                    guard let doc = snap?.documents.first,
-                          let name = doc.data()["name"] as? String else { return }
-                    fetchedFriends.append(User(id: email, name: name))
+                    if let data = doc?.data(), let user = User(from: data) {
+                        fetchedFriends.append(user)
+                    }
                 }
             }
-            
+
             group.notify(queue: .main) {
                 self.friends = fetchedFriends
                 self.tableView.reloadData()
             }
         }
     }
-
 }
-

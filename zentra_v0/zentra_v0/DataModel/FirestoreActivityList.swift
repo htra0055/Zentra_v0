@@ -9,13 +9,6 @@ import Foundation
 import FirebaseFirestore
 
 
-struct FirestoreActivityItem: Codable {
-    let name: String
-    let placeID: String
-    let address: String
-    let type: String? // optional Activity rawValue
-}
-
 struct FirestoreActivityList: Codable {
     let id: String
     var name: String

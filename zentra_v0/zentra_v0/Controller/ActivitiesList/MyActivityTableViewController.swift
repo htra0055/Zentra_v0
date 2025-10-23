@@ -44,9 +44,20 @@ class MyActivityTableViewController: UITableViewController {
     func deleteActivity(_ activity: SavedActivity) {
         guard var list = activityList else { return }
         list.activities.removeAll { $0.id == activity.id }
-        ActivityManager.shared.updateList(list)
+//        ActivityManager.shared.updateList(list)
+        
+        
+        ActivityManager.shared.updateListInFirestore(list) { error in
+            if let error = error {
+                print("Failed to update list: \(error)")
+            } else {
+                print("List updated in Firestore successfully")
+            }
+        }
         activityList = list
     }
+    
+    
 
     // MARK: - Enable Swipe to Delete
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,

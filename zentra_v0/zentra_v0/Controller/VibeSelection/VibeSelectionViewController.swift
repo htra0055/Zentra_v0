@@ -14,6 +14,7 @@ import CoreLocation
 import GooglePlaces
 import UIKit
 
+
 class VibeSelectionViewController: UIViewController {
     
     // MARK: - User input
@@ -190,18 +191,25 @@ class VibeSelectionViewController: UIViewController {
                 print("Found \(places.count) places")
                 DispatchQueue.main.async {
                     self.showAlert(title: "Your Plan is saved and ready!", message: "") {
-                        if let tabBarController = self.tabBarController {
-                            if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
-                               let planVC = navController.viewControllers.first as? PlanViewController {
-                                planVC.plan = plan
-                            } else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
-                                planVC.plan = plan
-                            }
-                            tabBarController.selectedIndex = 1
+                        guard let tabBarController = self.tabBarController else { return }
+
+                        // Case 1: Plan VC is inside navigation controller
+                        if let navController = tabBarController.viewControllers?[1] as? UINavigationController,
+                           let planVC = navController.viewControllers.first as? PlanViewController {
+                            planVC.plan = plan
                         }
+                        // Case 2: Plan VC is directly in tab bar
+                        else if let planVC = tabBarController.viewControllers?[1] as? PlanViewController {
+                            planVC.plan = plan
+                        }
+
+                        tabBarController.selectedIndex = 1
                     }
                 }
 
+
+                
+                
             case .failure(let error):
                 print("Error: \(error)")
                 DispatchQueue.main.async {
@@ -295,8 +303,16 @@ extension VibeSelectionViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         // Stop updates to save battery
         manager.stopUpdatingLocation()
-        print("Current location updated: \(locations.last?.coordinate)")
+//        print("Current location updated: \(locations.last?.coordinate, default: <#default value#>)")
+        
+        if let coordinate = locations.last?.coordinate {
+            print("Current location updated: \(coordinate)")
+        } else {
+            print("Current location updated: nil")
+        }
+
     }
+    
     
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse || status == .authorizedAlways {
