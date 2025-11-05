@@ -20,51 +20,8 @@ class LoginSignupViewController: UIViewController {
         super.viewDidLoad()
     }
 
-    // MARK: - Signup
-//    @IBAction func signupTapped(_ sender: UIButton) {
-//        guard let email = emailTextField.text, !email.isEmpty,
-//              let password = passwordTextField.text, !password.isEmpty else {
-//            showAlert(title: "Missing Fields", message: "Please enter both email and password.")
-//            return
-//        }
-//
-//        guard isValidEmail(email) else {
-//            showAlert(title: "Invalid Email", message: "Please enter a valid email address.")
-//            return
-//        }
-//
-//        Auth.auth().createUser(withEmail: email, password: password) { authResult, error in
-//            if let error = error as NSError? {
-//                if error.code == AuthErrorCode.emailAlreadyInUse.rawValue {
-//                    self.showAlert(title: "Signup Error", message: "This email is already registered. Please log in instead.")
-//                } else {
-//                    self.showAlert(title: "Signup Error", message: error.localizedDescription)
-//                }
-//                return
-//            }
-//
-//            // Success: user created
-//            if let user = authResult?.user {
-//                let baseUserDoc: [String: Any] = [
-//                    "uid": user.uid,
-//                    "email": user.email ?? "",
-//                    "name": user.displayName ?? ""
-//                ]
-//
-//                self.db.collection("users").document(user.uid).setData(baseUserDoc) { error in
-//                    if let error = error {
-//                        print("Error saving base user to Firestore: \(error)")
-//                    } else {
-//                        print("Base user document created for \(user.uid)")
-//                    }
-//                }
-//
-//                // Ask user if they want to add a custom user ID
-//                self.promptForCustomUserID(for: user)
-//            }
-//        }
-//    }
 
+    // Mark: Sign-Up Tap
     
     @IBAction func signupTapped(_ sender: UIButton) {
         guard let email = emailTextField.text, !email.isEmpty,

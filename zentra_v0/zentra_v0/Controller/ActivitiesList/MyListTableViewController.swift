@@ -6,6 +6,9 @@
 //
 
 
+// TODO: Need notification (accept or reject shared list)
+// 
+
 import UIKit
 import GooglePlaces
 import CoreLocation

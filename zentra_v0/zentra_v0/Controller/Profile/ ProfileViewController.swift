@@ -5,6 +5,7 @@
 //  Created by Evelyn Tran on 17/9/2025.
 //
 
+// TODO: Can edit name, show userid, show email + add profile photo + weather + read me acknowledge function
 
 
 import UIKit

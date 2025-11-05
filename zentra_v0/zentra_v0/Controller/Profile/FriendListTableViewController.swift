@@ -5,6 +5,8 @@
 //  Created by Evelyn Tran on 7/10/2025.
 //
 
+// TODO: user can customise name or it add name (userid), not just show email
+
 import UIKit
 import GooglePlaces
 import FirebaseFirestore

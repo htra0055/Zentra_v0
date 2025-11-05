@@ -6,6 +6,8 @@
 //
 
 
+// TODO: Show name and address + search details + direction
+
 import UIKit
 import GooglePlaces
 import GooglePlacesSwift
@@ -73,18 +75,4 @@ class MyActivityTableViewController: UITableViewController {
         }
     }
 
-
-    // MARK: - Share Button
-    @IBAction func shareButtonTapped(_ sender: Any) {
-        
-//        guard let list = activityList else { return }
-//        let storyboard = UIStoryboard(name: "Main", bundle: nil)
-//        if let friendListVC = storyboard.instantiateViewController(withIdentifier: "FriendListTableViewController") as? FriendListTableViewController {
-//            // Convert activities to share
-//            friendListVC.activitiesToShare = list.activities.map {
-//                MockPlace(name: $0.name, address: $0.address)
-//            }
-//            navigationController?.pushViewController(friendListVC, animated: true)
-//        }
-    }
 }

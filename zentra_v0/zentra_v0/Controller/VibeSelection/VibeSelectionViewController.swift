@@ -8,6 +8,10 @@
 // TODO: Need a button for reset -> clear the user selection (so they dont have to unselected all their option)
 // TODO: Need to cofigure storyboard for collection view (UI Images)
 // TODO: need to add notification, reminder, my activities (get more details, date added), maps: get navigation straight on explore map., working on fire database
+// TODO: need to add location holder (user can input location)
+
+// TODO: UI need to be pretty
+
 
 import Foundation
 import CoreLocation

@@ -252,13 +252,13 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hLw-Bs-uOg">
-                                <rect key="frame" x="24" y="408.33333333333331" width="344" height="38.333333333333314"/>
+                                <rect key="frame" x="24" y="407.66666666666669" width="344" height="38.333333333333314"/>
                                 <color key="tintColor" systemColor="systemBrownColor"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Edit Profile"/>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Zui-L6-PZC">
-                                <rect key="frame" x="24" y="465.66666666666669" width="344" height="39"/>
+                                <rect key="frame" x="24" y="465" width="344" height="39"/>
                                 <color key="tintColor" red="0.55294120309999995" green="0.65098041299999998" blue="0.74117648599999997" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                                 <state key="normal" title="Button"/>
                                 <buttonConfiguration key="configuration" style="tinted" title="Friend List"/>
@@ -267,17 +267,17 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="xhI-vd-r0l">
-                                <rect key="frame" x="24" y="521.66666666666663" width="344" height="38.333333333333371"/>
+                                <rect key="frame" x="24" y="521" width="344" height="39"/>
                                 <color key="tintColor" red="0.69396019419999999" green="0.40115945409999998" blue="0.75073546170000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="tinted" title="Past Trips"/>
+                                <buttonConfiguration key="configuration" style="tinted" title="Read Me"/>
                             </button>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="xDs-hd-eXj">
                                 <rect key="frame" x="26.000000000000007" y="177" width="122.66666666666669" height="109"/>
                                 <color key="backgroundColor" red="0.1043634294" green="0.68714756249999998" blue="0.75073546170000005" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                             </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kyX-Zk-exU">
-                                <rect key="frame" x="26" y="308" width="340" height="50.333333333333314"/>
+                                <rect key="frame" x="26" y="308" width="340" height="49.666666666666686"/>
                                 <color key="backgroundColor" red="0.83137255909999996" green="0.6549019814" blue="0.63921570780000003" alpha="1" colorSpace="custom" customColorSpace="displayP3"/>
                             </view>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="UserEmail@gmail.com" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cJu-cw-FqY">
