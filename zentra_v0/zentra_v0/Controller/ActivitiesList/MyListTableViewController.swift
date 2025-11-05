@@ -32,7 +32,11 @@ class MyListTableViewController: UITableViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadListsFromFirestore()
+        observeIncomingSharedLists()
     }
+    
+   
+
 
     // MARK: - Load lists
     private func loadListsFromFirestore() {
@@ -156,6 +160,65 @@ class MyListTableViewController: UITableViewController {
         }
         present(activityVC, animated: true)
     }
+    
+    
+    private func observeIncomingSharedLists() {
+        ActivityManager.shared.listenForSharedLists { [weak self] sharedList in
+            // sharedList is FirestoreSharedList, not ActivityList
+            guard let self = self else { return }
+
+            DispatchQueue.main.async {
+                let alert = UIAlertController(
+                    title: "New Shared List",
+                    message: "\(sharedList.fromName) shared '\(sharedList.listName)' with you.",
+                    preferredStyle: .alert
+                )
+
+                alert.addAction(UIAlertAction(title: "Reject", style: .destructive, handler: { _ in
+                    self.rejectSharedList(sharedList)
+                }))
+
+                alert.addAction(UIAlertAction(title: "Accept", style: .default, handler: { _ in
+                    self.acceptSharedList(sharedList)
+                }))
+
+                self.present(alert, animated: true)
+            }
+        }
+    }
+
+    private func acceptSharedList(_ sharedList: FirestoreSharedList) {
+        let newList = sharedList.toActivityList()
+        
+        ActivityManager.shared.createList(name: newList.name) { error in
+            if let error = error {
+                print("Error creating accepted list: \(error)")
+            } else {
+        
+                ActivityManager.shared.saveList(newList)
+            }
+            self.removeSharedList(sharedList)
+            self.loadListsFromFirestore()
+        }
+
+    }
+    
+
+    private func rejectSharedList(_ sharedList: FirestoreSharedList) {
+        removeSharedList(sharedList)
+    }
+
+    private func removeSharedList(_ sharedList: FirestoreSharedList) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        Firestore.firestore()
+            .collection("sharedActivities")
+            .document(uid)
+            .collection("sharedLists")
+            .document(sharedList.id)
+            .delete()
+    }
+
+
 }
 
 // Helper struct for mock sharing

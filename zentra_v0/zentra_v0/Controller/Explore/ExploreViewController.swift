@@ -146,6 +146,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
             placeID: item.placemark.name ?? UUID().uuidString,
             address: item.placemark.title ?? ""
         )
+
         var updatedList = list
         updatedList.activities.append(activity)
 
@@ -167,24 +168,50 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
-    private func createNewListAndSave(_ item: MKMapItem) {
+    private func createNewListWithActivity(_ item: MKMapItem) {
         let alert = UIAlertController(title: "New List", message: "Enter a name for your new list", preferredStyle: .alert)
-        alert.addTextField { textField in
-            textField.placeholder = "List Name"
-        }
+        alert.addTextField { $0.placeholder = "List Name" }
 
         alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { _ in
             guard let listName = alert.textFields?.first?.text, !listName.isEmpty else { return }
+
+            // Step 1: Create empty list
             ActivityManager.shared.createList(name: listName) { [weak self] error in
                 guard let self = self else { return }
                 if let error = error {
-                    print("Error creating list: \(error)")
+                    print("Error creating new list: \(error)")
                     return
                 }
-                // Fetch latest lists to get the newly created one
-                ActivityManager.shared.fetchUserLists{ _ in
-                    guard let newList = ActivityManager.shared.getUserLists().last else { return }
-                    self.saveItem(item, to: newList)
+
+                // Step 2: Fetch latest lists to get the newly created one
+                ActivityManager.shared.fetchUserLists { lists in
+                    guard let newList = lists.first(where: { $0.name == listName }) else { return }
+
+                    // Step 3: Add the activity
+                    let activity = SavedActivity(
+                        name: item.name ?? "Unknown Place",
+                        placeID: item.placemark.name ?? UUID().uuidString,
+                        address: item.placemark.title ?? ""
+                    )
+                    var updatedList = newList
+                    updatedList.activities.append(activity)
+
+                    // Step 4: Update Firestore with the list containing the activity
+                    ActivityManager.shared.updateListInFirestore(updatedList) { error in
+                        DispatchQueue.main.async {
+                            if let error = error {
+                                print("Error saving activity: \(error)")
+                            } else {
+                                let confirmation = UIAlertController(
+                                    title: "Saved!",
+                                    message: "\(item.name ?? "Place") has been saved to \"\(listName)\".",
+                                    preferredStyle: .alert
+                                )
+                                confirmation.addAction(UIAlertAction(title: "OK", style: .default))
+                                self.present(confirmation, animated: true)
+                            }
+                        }
+                    }
                 }
             }
         }))
@@ -193,36 +220,43 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         present(alert, animated: true)
     }
 
+
     private func savePlaceToList(_ item: MKMapItem) {
-        let userLists = ActivityManager.shared.getUserLists()
+        // Fetch latest lists from Firestore
+        ActivityManager.shared.fetchUserLists { lists in
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
 
-        if userLists.isEmpty {
-            // No lists, create default
-            ActivityManager.shared.createList(name: "My Activities") { [weak self] error in
-                guard let self = self else { return }
-                if let error = error { print(error); return }
-                guard let defaultList = ActivityManager.shared.getUserLists().first else { return }
-                self.saveItem(item, to: defaultList)
+                if lists.isEmpty {
+                    // No lists exist, only option is to create new list
+                    alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
+                        self.createNewListWithActivity(item)
+                    }))
+                } else {
+                    // Show existing lists
+                    for list in lists {
+                        alert.addAction(UIAlertAction(title: list.name, style: .default, handler: { _ in
+                            self.saveItem(item, to: list)
+                        }))
+                    }
+                    // Option to create a new list
+                    alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
+                        self.createNewListWithActivity(item)
+                    }))
+                }
+
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                self.present(alert, animated: true)
             }
-        } else {
-            // Let user pick a list
-            let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
-
-            for list in userLists {
-                alert.addAction(UIAlertAction(title: list.name, style: .default, handler: { _ in
-                    self.saveItem(item, to: list)
-                }))
-            }
-
-            // Option to create new list
-            alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
-                self.createNewListAndSave(item)
-            }))
-
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-            present(alert, animated: true)
         }
     }
+
+
+
+
+
+
+
 }
 
 // MARK: - CLLocationManagerDelegate
@@ -287,20 +321,47 @@ extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
         present(alert, animated: true)
     }
 
+//    private func showPlaceDetails(_ item: MKMapItem) {
+//        let message = "Address: \(item.placemark.title ?? "Unknown")\nPhone: \(item.phoneNumber ?? "N/A")"
+//        let detailsAlert = UIAlertController(title: item.name, message: message, preferredStyle: .alert)
+//        detailsAlert.addAction(UIAlertAction(title: "Open in Safari", style: .default, handler: { _ in
+//            if let name = item.name, let address = item.placemark.title {
+//                let query = "\(name) \(address)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
+//                if let query = query, let url = URL(string: "https://www.google.com/search?q=\(query)") {
+//                    UIApplication.shared.open(url)
+//                }
+//            }
+//        }))
+//        detailsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+//        present(detailsAlert, animated: true)
+//    }
+
     private func showPlaceDetails(_ item: MKMapItem) {
-        let message = "Address: \(item.placemark.title ?? "Unknown")\nPhone: \(item.phoneNumber ?? "N/A")"
+        // Construct message with address + phone
+        let message = """
+        Address: \(item.placemark.title ?? "Unknown")
+        Phone: \(item.phoneNumber ?? "N/A")
+        """
+//        var placemark: MKPlacemark { get }
         let detailsAlert = UIAlertController(title: item.name, message: message, preferredStyle: .alert)
         detailsAlert.addAction(UIAlertAction(title: "Open in Safari", style: .default, handler: { _ in
-            if let name = item.name, let address = item.placemark.title {
+            // Combine name + address for Google search
+            if let name = item.name,
+               let address = item.placemark.title {
                 let query = "\(name) \(address)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
                 if let query = query, let url = URL(string: "https://www.google.com/search?q=\(query)") {
-                    UIApplication.shared.open(url)
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
                 }
             }
         }))
+
+        // Cancel option
         detailsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+
         present(detailsAlert, animated: true)
     }
+
+
 }
 
 // MARK: - MKMapViewDelegate

@@ -5,6 +5,9 @@
 //  Created by Evelyn Tran on 23/10/2025.
 //
 
+// TO DO: when search, must include place + address
+
+
 import UIKit
 import CoreLocation
 import GooglePlaces
@@ -20,7 +23,7 @@ class PlanViewController: UIViewController {
             }
         }
     }
-    
+
     private var displayedPlaces: [GMSPlace] = []
 
     @IBOutlet weak var placesScrollView: UIScrollView!
@@ -56,15 +59,18 @@ class PlanViewController: UIViewController {
 
     // MARK: - Fetch Places
     private func fetchPlaces(for plan: Plan) {
+        // Clear previous views
         contentStack.arrangedSubviews.forEach { view in
             contentStack.removeArrangedSubview(view)
             view.removeFromSuperview()
         }
 
         guard let userLocation = plan.userCoordinate else {
-            let alert = UIAlertController(title: "Missing Location",
-                                          message: "Could not resolve location, using default (Melbourne).",
-                                          preferredStyle: .alert)
+            let alert = UIAlertController(
+                title: "Missing Location",
+                message: "Could not resolve location, using default (Melbourne).",
+                preferredStyle: .alert
+            )
             alert.addAction(UIAlertAction(title: "OK", style: .default))
             present(alert, animated: true)
             return
@@ -75,18 +81,22 @@ class PlanViewController: UIViewController {
             switch result {
             case .success(let places):
                 if places.isEmpty {
-                    let alert = UIAlertController(title: "No Results",
-                                                  message: "No nearby places found for your plan.",
-                                                  preferredStyle: .alert)
+                    let alert = UIAlertController(
+                        title: "No Results",
+                        message: "No nearby places found for your plan.",
+                        preferredStyle: .alert
+                    )
                     alert.addAction(UIAlertAction(title: "OK", style: .default))
                     self.present(alert, animated: true)
                 } else {
                     self.displayPlaces(places)
                 }
             case .failure(let error):
-                let alert = UIAlertController(title: "Search Error",
-                                              message: error.localizedDescription,
-                                              preferredStyle: .alert)
+                let alert = UIAlertController(
+                    title: "Search Error",
+                    message: error.localizedDescription,
+                    preferredStyle: .alert
+                )
                 alert.addAction(UIAlertAction(title: "OK", style: .default))
                 self.present(alert, animated: true)
             }
@@ -96,6 +106,7 @@ class PlanViewController: UIViewController {
     // MARK: - Display Places
     private func displayPlaces(_ places: [GMSPlace]) {
         self.displayedPlaces = places
+
         for (index, place) in places.enumerated() {
             let container = UIView()
             container.layer.cornerRadius = 12
@@ -158,15 +169,13 @@ class PlanViewController: UIViewController {
 
         let alert = UIAlertController(title: place.name, message: "Choose an action", preferredStyle: .alert)
 
-        // Open Google Search
         alert.addAction(UIAlertAction(title: "Search Details", style: .default, handler: { _ in
             if let name = place.name?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed),
                let url = URL(string: "https://www.google.com/search?q=\(name)") {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                UIApplication.shared.open(url, options: [:])
             }
         }))
 
-        // Add to My Activities
         alert.addAction(UIAlertAction(title: "Add to My Activities", style: .default, handler: { _ in
             self.addPlaceToActivities(place)
         }))
@@ -175,54 +184,99 @@ class PlanViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    // MARK: - Add to Activities
+    // MARK: - Add Place to Activities (ActivityList version)
+//    private func addPlaceToActivities(_ place: GMSPlace) {
+//        ActivityManager.shared.fetchUserLists { lists in
+//            DispatchQueue.main.async {
+//                let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
+//
+//                for list in lists {
+//                    alert.addAction(UIAlertAction(title: list.name, style: .default, handler: { _ in
+//                        self.addPlace(place, to: list)
+//                    }))
+//                }
+//
+//                alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
+//                    self.createNewListAndAdd(place: place)
+//                }))
+//
+//                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+//                self.present(alert, animated: true)
+//            }
+//        }
+//    }
+    
     private func addPlaceToActivities(_ place: GMSPlace) {
-        let userLists = ActivityManager.shared.getUserLists()
-        let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
+        // Fetch AND update local cache first
+        ActivityManager.shared.fetchUserListsForCurrentUser { lists in
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
 
-        // Existing lists
-        for list in userLists {
-            alert.addAction(UIAlertAction(title: list.name, style: .default, handler: { _ in
-                ActivityManager.shared.addActivity(place: place, toList: list) { error in
-                    if let error = error { self.showError(error) }
-                    else { print("Activity added to \(list.name)") }
+                for list in lists {
+                    alert.addAction(UIAlertAction(title: list.name, style: .default, handler: { _ in
+                        self.addPlace(place, to: list)
+                    }))
                 }
-            }))
+
+                alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
+                    self.createNewListAndAdd(place: place)
+                }))
+
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                self.present(alert, animated: true)
+            }
         }
-
-        // Create new list
-        alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
-            self.createNewListAndAdd(place: place)
-        }))
-
-        alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        present(alert, animated: true)
     }
+
+
+    private func addPlace(_ place: GMSPlace, to list: ActivityList) {
+        ActivityManager.shared.addActivity(place: place, toList: list) { error in
+            DispatchQueue.main.async {
+                if let error = error {
+                    self.showError(error)
+                } else {
+                    let confirmation = UIAlertController(
+                        title: "Saved!",
+                        message: "\(place.name ?? "Place") has been saved to \"\(list.name)\".",
+                        preferredStyle: .alert
+                    )
+                    confirmation.addAction(UIAlertAction(title: "OK", style: .default))
+                    self.present(confirmation, animated: true)
+                }
+            }
+        }
+    }
+
 
     private func createNewListAndAdd(place: GMSPlace) {
         let alert = UIAlertController(title: "New List", message: "Enter a name for your new list", preferredStyle: .alert)
         alert.addTextField { $0.placeholder = "List Name" }
+
         alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { _ in
             guard let listName = alert.textFields?.first?.text, !listName.isEmpty else { return }
 
             ActivityManager.shared.createList(name: listName) { error in
-                if let error = error { self.showError(error); return }
+                if let error = error {
+                    self.showError(error)
+                    return
+                }
 
-                guard let newList = ActivityManager.shared.getUserLists().last else { return }
-                ActivityManager.shared.addActivity(place: place, toList: newList) { error in
-                    if let error = error { self.showError(error) }
-                    else { print("Activity added to new list \(listName)") }
+                ActivityManager.shared.fetchUserLists { fetchedLists in
+                    guard let newList = fetchedLists.first(where: { $0.name == listName }) else { return }
+                    self.addPlace(place, to: newList)
                 }
             }
         }))
+
         alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(alert, animated: true)
     }
 
-    // MARK: - Error
+    // MARK: - Error Handling
     private func showError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
         present(alert, animated: true)
     }
 }
+

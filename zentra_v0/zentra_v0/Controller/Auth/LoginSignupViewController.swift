@@ -165,6 +165,14 @@ class LoginSignupViewController: UIViewController {
                 self.showAlert(title: "Login Error", message: error.localizedDescription)
                 return
             }
+            
+            //  Clear previous user's lists
+            ActivityManager.shared.resetListsForNewUser()
+
+            // Fetch current user's lists from Firestore
+            ActivityManager.shared.fetchUserLists { lists in
+                print("Loaded \(lists.count) lists for current user")
+            }
 
             if let user = authResult?.user {
                 self.db.collection("users").document(user.uid).getDocument { document, error in

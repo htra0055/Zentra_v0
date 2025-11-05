@@ -11,33 +11,7 @@ import FirebaseAuth
 import GooglePlaces
 import UIKit
 
-// MARK: - Saved Activity
-struct SavedActivity: Identifiable, Codable {
-    let id: UUID
-    let name: String
-    let placeID: String
-    let address: String
 
-    init(name: String, placeID: String, address: String) {
-        self.id = UUID()
-        self.name = name
-        self.placeID = placeID
-        self.address = address
-    }
-}
-
-// MARK: - Activity List
-struct ActivityList: Identifiable, Codable {
-    let id: UUID
-    var name: String
-    var activities: [SavedActivity]
-
-    init(name: String, activities: [SavedActivity] = []) {
-        self.id = UUID()
-        self.name = name
-        self.activities = activities
-    }
-}
 
 // MARK: - Activity Manager
 class ActivityManager {
@@ -51,7 +25,7 @@ class ActivityManager {
         return userLists
     }
 
-    // Create a new list and save to Firebase
+    // MARK: - Create a New List
     func createList(name: String, completion: ((Error?) -> Void)? = nil) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         let newList = ActivityList(name: name)
@@ -66,19 +40,23 @@ class ActivityManager {
             }
     }
 
-    // Add activity to list
+    // MARK: - Add Activity
     func addActivity(place: GMSPlace, toList list: ActivityList, completion: ((Error?) -> Void)? = nil) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        // Find the list in local cache
         guard let index = userLists.firstIndex(where: { $0.id == list.id }) else { return }
-
+        
         let activity = SavedActivity(
             name: place.name ?? "Unknown Place",
             placeID: place.placeID ?? "",
             address: place.formattedAddress ?? ""
         )
+        
+        // Update local list
         userLists[index].activities.append(activity)
-
-        // Save updated list to Firebase
+        
+        // Update Firestore
         let firestoreList = convertToFirestore(userLists[index])
         Firestore.firestore()
             .collection("users").document(uid)
@@ -87,6 +65,28 @@ class ActivityManager {
                 completion?(error)
             }
     }
+    
+    
+    
+
+    // MARK: - Delete List
+    func deleteList(_ list: ActivityList, completion: ((Error?) -> Void)? = nil) {
+        guard let uid = Auth.auth().currentUser?.uid else { return }
+        
+        // Remove from local cache
+        if let index = userLists.firstIndex(where: { $0.id == list.id }) {
+            userLists.remove(at: index)
+        }
+        
+        // Remove from Firestore
+        Firestore.firestore()
+            .collection("users").document(uid)
+            .collection("activityLists").document(list.id.uuidString)
+            .delete { error in
+                completion?(error)
+            }
+    }
+    
 
     // MARK: - Firestore Conversion
     func convertToFirestore(_ list: ActivityList) -> FirestoreActivityList {
@@ -108,13 +108,16 @@ class ActivityManager {
         let activities = firestoreList.activities.map {
             SavedActivity(name: $0.name, placeID: $0.placeID, address: $0.address)
         }
-        return ActivityList(name: firestoreList.name, activities: activities)
+        // Preserve Firestore document ID as UUID
+        return ActivityList(
+            id: UUID(uuidString: firestoreList.id) ?? UUID(),
+            name: firestoreList.name,
+            activities: activities
+        )
     }
-
-
-
 }
 
+// MARK: - Firestore Extension Methods
 extension ActivityManager {
 
     /// Update a list in Firestore
@@ -123,7 +126,6 @@ extension ActivityManager {
         let db = Firestore.firestore()
 
         let firestoreList = convertToFirestore(list)
-
         db.collection("users").document(currentUID)
             .collection("activityLists").document(firestoreList.id)
             .setData(firestoreList.toDict()) { error in
@@ -131,51 +133,75 @@ extension ActivityManager {
             }
     }
     
-    // MARK: - Fetch Lists from Firebase - Fetch the current user's activity lists from Firestore
-      func fetchUserLists(completion: @escaping ([ActivityList]) -> Void) {
-          guard let currentUID = Auth.auth().currentUser?.uid else { completion([]); return }
-          let db = Firestore.firestore()
+    // MARK: - Fetch Lists for Current User
+    func fetchUserLists(completion: @escaping ([ActivityList]) -> Void) {
+        guard let currentUID = Auth.auth().currentUser?.uid else { completion([]); return }
+        let db = Firestore.firestore()
 
-          db.collection("users").document(currentUID)
-              .collection("activityLists")
-              .order(by: "timestamp", descending: true)
-              .getDocuments { snapshot, error in
-                  guard let docs = snapshot?.documents else {
-                      completion([])
-                      return
-                  }
-                  // Convert FirestoreActivityList -> ActivityList
-                  let lists = docs.compactMap { doc -> ActivityList? in
-                      guard let firestoreList = FirestoreActivityList(from: doc.data(), id: doc.documentID) else { return nil }
-                      return self.convertToLocal(firestoreList)
-                  }
-                  completion(lists)
-              }
-      }
+        db.collection("users").document(currentUID)
+            .collection("activityLists")
+            .order(by: "timestamp", descending: true)
+            .getDocuments { snapshot, error in
+                guard let docs = snapshot?.documents else {
+                    completion([])
+                    return
+                }
+                // Convert FirestoreActivityList -> ActivityList
+                let lists = docs.compactMap { doc -> ActivityList? in
+                    guard let firestoreList = FirestoreActivityList(from: doc.data(), id: doc.documentID) else { return nil }
+                    return self.convertToLocal(firestoreList)
+                }
+                completion(lists)
+            }
+    }
     
     func saveList(_ list: ActivityList, completion: ((Error?) -> Void)? = nil) {
-          guard let currentUID = Auth.auth().currentUser?.uid else { return }
-          let db = Firestore.firestore()
-          let firestoreList = convertToFirestore(list)
+        guard let currentUID = Auth.auth().currentUser?.uid else { return }
+        let db = Firestore.firestore()
+        let firestoreList = convertToFirestore(list)
 
-          db.collection("users").document(currentUID)
-              .collection("activityLists").document(firestoreList.id)
-              .setData(firestoreList.toDict()) { error in
-                  completion?(error)
-              }
-      }
-    
-    func deleteList(_ list: ActivityList, completion: ((Error?) -> Void)? = nil) {
-            guard let currentUID = Auth.auth().currentUser?.uid else { return }
-            let db = Firestore.firestore()
+        db.collection("users").document(currentUID)
+            .collection("activityLists").document(firestoreList.id)
+            .setData(firestoreList.toDict()) { error in
+                completion?(error)
+            }
+    }
 
-            db.collection("users").document(currentUID)
-                .collection("activityLists").document(list.id.uuidString) // make sure id matches Firestore
-                .delete { error in
-                    completion?(error)
-                }
+    // MARK: - Reset and Refetch
+    func resetListsForNewUser() {
+        userLists.removeAll()
+    }
+
+    func fetchUserListsForCurrentUser(completion: @escaping ([ActivityList]) -> Void) {
+        resetListsForNewUser() // clear previous local lists first
+        fetchUserLists { lists in
+            self.userLists = lists
+            completion(lists)
         }
+    }
+
+    
+    // Mark: watch for incoming shared list
+    func listenForSharedLists(onReceive: @escaping (FirestoreSharedList) -> Void) {
+           guard let uid = Auth.auth().currentUser?.uid else { return }
+           let db = Firestore.firestore()
+
+           db.collection("sharedActivities")
+               .document(uid)
+               .collection("sharedLists")
+               .addSnapshotListener { snapshot, error in
+                   guard let docs = snapshot?.documentChanges else { return }
+
+                   for change in docs where change.type == .added {
+                       if let sharedList = FirestoreSharedList(from: change.document.data(), id: change.document.documentID) {
+                           onReceive(sharedList)
+                       }
+                   }
+               }
+       }
+
+
     
 
+    
 }
-
