@@ -3,15 +3,18 @@
 //  zentra_v0
 //
 //  Created by Evelyn Tran on 17/9/2025.
+// Acknowledgements:
 //
-
-// TODO: Need a button for reset -> clear the user selection (so they dont have to unselected all their option)
-// TODO: Need to cofigure storyboard for collection view (UI Images)
-// TODO: need to add notification, reminder, my activities (get more details, date added), maps: get navigation straight on explore map., working on fire database
-// TODO: need to add location holder (user can input location)
-
-// TODO: UI need to be pretty
-
+// Libraries & SDKs:
+// - CoreLocation (Apple) – https://developer.apple.com/documentation/corelocation
+// - Google Places SDK for iOS (Google) – https://developers.google.com/places/ios-sdk
+//
+// Purpose:
+// Allows users to select preferences for their trip, including interests, energy level, and duration.
+// Handles user location input (via GPS or text address), resolves coordinates, and triggers place search
+// through `FindPlaceEngine`. Supports adding selections to a plan, updating UI, and creating a Plan object.
+// Futher develop: userInputAddress - adding textfield where user can input location
+//
 
 import Foundation
 import CoreLocation
@@ -19,24 +22,36 @@ import GooglePlaces
 import UIKit
 
 
+/// `VibeSelectionViewController` enables users to select trip preferences including:
+/// - Interests (Activity)
+/// - Energy (Mood)
+/// - Duration (TripDuration)
+///
+/// It manages location resolution, updates selection UI, and integrates with the plan search engine.
 class VibeSelectionViewController: UIViewController {
     
-    // MARK: - User input
+    // MARK: - Properties
+       
+    /// User-selected interests
     var selectedInterests: [Activity] = []
+    
+    /// User-selected energy/mood
     var selectedEnergy: Mood?
+    
+    /// User-selected trip duration
     var selectedDuration: TripDuration?
     
-    // TODO: Location: get from text input or nil
-    // MARK: - Location Handling
 
-    
+    /// Location manager for GPS access
     private let locationManager = CLLocationManager()
        
-    // store the geocoded coordinate once resolved
+    /// Resolved coordinate from user input or current location
     private var resolvedCoordinate: CLLocationCoordinate2D?
+   
+    /// Default user input address (fallback)
     private let userInputAddress: String? = "Melbourne"
 
-    // Computed fallback order
+    /// Computed coordinate to use for searches
     var searchLocation: CLLocationCoordinate2D {
         if let resolved = resolvedCoordinate {
             return resolved
@@ -47,7 +62,7 @@ class VibeSelectionViewController: UIViewController {
         }
     }
     
-    // Store original button styles
+    /// Stores original button styles to toggle selection
     private var originalButtonStyles: [UIButton: (bgColor: UIColor?, titleColor: UIColor?)] = [:]
     
     // MARK: - Outlets
@@ -67,10 +82,13 @@ class VibeSelectionViewController: UIViewController {
     @IBOutlet weak var CreatePlanButton: UIButton!
     
     // MARK: - Lifecycle
+     /**
+      Configures buttons, saves default styles, requests location access, and resolves initial user input location.
+      Updates selection UI.
+      */
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        // Save default styles for all buttons
+
         let allButtons = [
             AdventureButton, CulturalButton, FoodieButton, NightlifeButton,
             RelaxationButton, NatureButton,
@@ -85,9 +103,7 @@ class VibeSelectionViewController: UIViewController {
                 )
             }
         }
-        
 
-         // Location setup
         locationManager.delegate = self
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
@@ -98,13 +114,14 @@ class VibeSelectionViewController: UIViewController {
             print("Resolved user input to coordinate: \(String(describing: coordinate))")
                 }
             }
-
-
-        
         updateSelectionView()
     }
     
     // MARK: - Actions
+   
+    /**
+       Handles selection/deselection of interest buttons and updates UI.
+    */
     @IBAction func interestTapped(_ sender: UIButton) {
         guard let title = sender.title(for: .normal),
               let type = Activity(rawValue: title) else { return }
@@ -120,6 +137,9 @@ class VibeSelectionViewController: UIViewController {
         updateSelectionView()
     }
 
+    /**
+     Handles selection of energy level, ensures only one selection at a time.
+     */
     @IBAction func energyTapped(_ sender: UIButton) {
         let buttons = [LowkeyButton, BalancedButton, HighenergyButton]
         buttons.forEach { $0?.restoreStyle(from: originalButtonStyles[$0!]) }
@@ -136,6 +156,9 @@ class VibeSelectionViewController: UIViewController {
         updateSelectionView()
     }
 
+    /**
+       Handles trip duration selection and updates UI.
+       */
     @IBAction func tripDurationChanged(_ sender: UISegmentedControl) {
         if let title = sender.titleForSegment(at: sender.selectedSegmentIndex),
            let duration = TripDuration(rawValue: title) {
@@ -144,7 +167,13 @@ class VibeSelectionViewController: UIViewController {
         updateSelectionView()
     }
     
-    // convert string (location) to coordinates
+    /**
+     Converts a string address to CLLocationCoordinate2D asynchronously.
+     
+     - Parameters:
+        - address: The address string to geocode.
+        - completion: Closure returning the resolved coordinate or nil if failed.
+     */
     func getCoordinates(for address: String, completion: @escaping (CLLocationCoordinate2D?) -> Void) {
         let geocoder = CLGeocoder()
         geocoder.geocodeAddressString(address) { placemarks, error in
@@ -160,7 +189,11 @@ class VibeSelectionViewController: UIViewController {
             }
         }
     }
-    // v1
+    
+    /**
+     Handles creation of a Plan object and triggers place search via `FindPlaceEngine`.
+     Ensures all required selections are made and resolves location if needed.
+     */
     @IBAction func createPlanTapped(_ sender: UIButton) {
         guard let energy = selectedEnergy,
               let duration = selectedDuration else {
@@ -184,7 +217,9 @@ class VibeSelectionViewController: UIViewController {
     }
 
     
-    // to resolve search location
+    /**
+      Executes place search for a plan using resolved coordinates and updates PlanViewController.
+      */
     private func runSearchEngine(with plan: Plan) {
         let location = searchLocation
         print("Running search with coordinates: \(location.latitude), \(location.longitude)")
@@ -225,10 +260,11 @@ class VibeSelectionViewController: UIViewController {
 
 
 
-
-    
     
     // MARK: - Helpers
+      /**
+       Updates the UI stack view to reflect current user selections.
+       */
     func updateSelectionView() {
         YourSelectionStackView.arrangedSubviews.forEach { view in
             YourSelectionStackView.removeArrangedSubview(view)
@@ -261,7 +297,9 @@ class VibeSelectionViewController: UIViewController {
         }
     }
     
-    // MARK: show notification
+    /**
+      Displays an alert with a title, message, and optional completion handler.
+      */
     func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
@@ -302,10 +340,10 @@ extension UIColor {
     }
 }
 
-// Ask for permission
+// MARK: - CLLocationManagerDelegate
 extension VibeSelectionViewController: CLLocationManagerDelegate {
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        // Stop updates to save battery
+
         manager.stopUpdatingLocation()
 //        print("Current location updated: \(locations.last?.coordinate, default: <#default value#>)")
         

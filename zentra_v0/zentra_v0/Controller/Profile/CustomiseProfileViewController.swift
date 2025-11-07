@@ -8,14 +8,23 @@ import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 
+// MARK: Class
+/// Controller to customise the user's profile including display name and profile image.
+/// Supports caching to UserDefaults and saving updates to Firestore.
+/// Notifies `ProfileViewController` when changes occur.
 class CustomiseProfileViewController: UIViewController {
 
+    // MARK: Outlet
     @IBOutlet weak var nameTextField: UITextField!
     @IBOutlet weak var profileImageView: UIImageView!
 
+    // MARK: - Properties
+    /// Firestore database reference
     private let db = Firestore.firestore()
     private var currentUID: String { Auth.auth().currentUser?.uid ?? "" }
 
+    // MARK: - Lifecycle
+    /// Called after the controller's view is loaded. Sets up UI and loads cached profile.
     override func viewDidLoad() {
         super.viewDidLoad()
         setupProfileImageView()
@@ -24,7 +33,9 @@ class CustomiseProfileViewController: UIViewController {
         makeProfileImageCircular()
     }
 
-    // MARK: Load cached values first
+
+    // MARK: - Load Profile
+    /// Loads user profile from local cache (UserDefaults) and sets initial UI values.
     private func loadUserProfile() {
         nameTextField.text = UserDefaults.standard.string(forKey: "displayName_\(currentUID)")
         if let imageData = UserDefaults.standard.data(forKey: "profileImageData_\(currentUID)") {
@@ -34,6 +45,8 @@ class CustomiseProfileViewController: UIViewController {
         }
     }
 
+    // MARK: - Setup
+    /// Configures profile image view appearance and gesture recognizer for selecting a new image
     private func setupProfileImageView() {
         profileImageView.layer.cornerRadius = profileImageView.bounds.width / 2
         profileImageView.clipsToBounds = true
@@ -42,12 +55,14 @@ class CustomiseProfileViewController: UIViewController {
         profileImageView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(selectProfileImage)))
     }
     
+    /// Ensures profile image is circular and clipped correctly
     private func makeProfileImageCircular() {
         profileImageView.layer.cornerRadius = profileImageView.frame.width / 2
         profileImageView.clipsToBounds = true
         profileImageView.contentMode = .scaleAspectFill
     }
 
+    /// Configures text fields (delegate and return key)
     @objc private func selectProfileImage() {
         let picker = UIImagePickerController()
         picker.delegate = self
@@ -56,22 +71,25 @@ class CustomiseProfileViewController: UIViewController {
         present(picker, animated: true)
     }
 
+    // MARK: - Image Selection
+    /// Opens UIImagePickerController to allow user to select a new profile image
     private func setupTextFields() {
         nameTextField.delegate = self
         nameTextField.returnKeyType = .done
     }
 
-    // MARK: Convert image to Base64, Save to Firestore,Update local cache, Notify ProfileViewController to reload
+    // MARK: - Save Changes
+    /// Saves the display name and profile image to Firestore
+    /// Converts the image to Base64 before saving
+    /// Updates local cache and notifies `ProfileViewController` to reload
     @IBAction func saveChangesButton(_ sender: Any) {
         guard let displayName = nameTextField.text?.trimmingCharacters(in: .whitespaces), !displayName.isEmpty else {
             showAlert(title: "Invalid Name", message: "Please enter a valid display name.")
             return
         }
-
         var updateData: [String: Any] = ["displayName": displayName]
-
-       
         var imageData: Data? = nil
+
         if let image = profileImageView.image,
            let resized = image.resized(toMax: 512),
            let data = resized.jpegDataCompressed(quality: 0.7) {
@@ -79,23 +97,16 @@ class CustomiseProfileViewController: UIViewController {
             updateData["profileImageBase64"] = base64String
             imageData = data
         }
-
-
         
         db.collection("users").document(currentUID).updateData(updateData) { error in
             if let error = error {
                 self.showAlert(title: "Error", message: error.localizedDescription)
             } else {
               
-                UserDefaults.standard.set(displayName, forKey: "displayName_\(self.currentUID)")
-                if let data = imageData {
-                    UserDefaults.standard.set(data, forKey: "profileImageData_\(self.currentUID)")
-                }
-
-            
+        UserDefaults.standard.set(displayName, forKey: "displayName_\(self.currentUID)")
+            if let data = imageData {
+                UserDefaults.standard.set(data, forKey: "profileImageData_\(self.currentUID)")}
                 NotificationCenter.default.post(name: Notification.Name("ProfileUpdated"), object: nil)
-
-   
                 let alert = UIAlertController(title: "Success", message: "Profile successfully updated!", preferredStyle: .alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default) { _ in
                     self.navigationController?.popViewController(animated: true)
@@ -105,6 +116,8 @@ class CustomiseProfileViewController: UIViewController {
         }
     }
 
+    // MARK: - Alerts
+    // Shows a simple UIAlertController with given title and message
     private func showAlert(title: String, message: String) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))
@@ -113,6 +126,7 @@ class CustomiseProfileViewController: UIViewController {
 }
 
 // MARK: - UIImagePicker
+/// Handles selection and cancellation of profile image picking
 extension CustomiseProfileViewController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
     func imagePickerController(_ picker: UIImagePickerController,
                                didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
@@ -130,6 +144,7 @@ extension CustomiseProfileViewController: UIImagePickerControllerDelegate, UINav
 }
 
 // MARK: - UITextFieldDelegate
+/// Handles return key behavior for text fields
 extension CustomiseProfileViewController: UITextFieldDelegate {
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -137,8 +152,10 @@ extension CustomiseProfileViewController: UITextFieldDelegate {
     }
 }
 
+// MARK: - UIImage Extension
 extension UIImage {
-    // MARK: Resize the image to fit within maxSize while maintaining aspect ratio
+ 
+    /// Resizes the image to fit within `maxSize` while maintaining aspect ratio
     func resized(toMax maxSize: CGFloat) -> UIImage? {
         let maxDimension = max(size.width, size.height)
         guard maxDimension > maxSize else { return self }
@@ -153,7 +170,7 @@ extension UIImage {
         return resizedImage
     }
     
-    // MARK: Convert to JPEG Data with optional compression quality (0.0 - 1.0)
+    /// Converts image to JPEG Data with optional compression quality (0.0 - 1.0)
     func jpegDataCompressed(quality: CGFloat = 0.7) -> Data? {
         return self.jpegData(compressionQuality: quality)
     }

@@ -47,12 +47,12 @@ private class WeakObjectWrapper: Equatable, Hashable {
         self.value = value
     }
     
-    // Hash based on the address (pointer) of the value.
+    /// Hash based on the address (pointer) of the value.
     func hash(into hasher: inout Hasher) {
         hasher.combine(ObjectIdentifier(value!).hashValue)
     }
     
-    // Equate based on equality of the value pointers of two wrappers.
+    /// Equate based on equality of the value pointers of two wrappers.
     static func == (lhs: WeakObjectWrapper, rhs: WeakObjectWrapper) -> Bool {
         return lhs.value === rhs.value
     }

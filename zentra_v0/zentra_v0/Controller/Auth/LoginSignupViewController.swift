@@ -3,12 +3,20 @@
 //  zentra_v0
 //
 //  Created by Evelyn Tran on 18/9/2025.
+
+// Acknowledgements:
+//
+// Libraries:
+// - Firebase Auth (Apache 2.0 License) – https://firebase.google.com/docs/auth
+// - Firebase Firestore (Apache 2.0 License) – https://firebase.google.com/docs/firestore
+// - UIKit (Apple) – https://developer.apple.com/documentation/uikit
 //
 
 import UIKit
 import FirebaseAuth
 import FirebaseFirestore
 
+/// ViewController that handles login and signup of users using Firebase Auth and stores user info in Firestore.
 class LoginSignupViewController: UIViewController {
 
     @IBOutlet weak var emailTextField: UITextField!
@@ -22,7 +30,8 @@ class LoginSignupViewController: UIViewController {
 
 
     // Mark: Sign-Up Tap
-    
+    /// Handles sign-up process when user taps the sign-up button.
+    /// - Parameter sender: UIButton triggering signup
     @IBAction func signupTapped(_ sender: UIButton) {
         guard let email = emailTextField.text, !email.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
@@ -70,6 +79,8 @@ class LoginSignupViewController: UIViewController {
     }
 
     // MARK: - Optional UserID Prompt
+    /// Prompts user to optionally set a short userID for friend discovery.
+    /// - Parameter user: The FirebaseAuth.User just created
     private func promptForUserID(for user: FirebaseAuth.User) {
         let alert = UIAlertController(title: "Set a User ID (optional)",
                                       message: "Your friends can add you quickly using this ID. Leave empty to skip.",
@@ -95,6 +106,7 @@ class LoginSignupViewController: UIViewController {
     }
 
     // MARK: - Navigate to Home
+    /// Presents the main home tab bar view after login/signup
     private func showHomePage() {
         DispatchQueue.main.async {
             if let homeTabBar = self.storyboard?.instantiateViewController(withIdentifier: "HomePageTabBar") {
@@ -105,6 +117,8 @@ class LoginSignupViewController: UIViewController {
     }
 
     // MARK: - Login
+    /// Handles user login with Firebase Auth:  Clear previous user's list and  Fetch current user's lists from Firestore
+    /// - Parameter sender: UIButton triggering login
     @IBAction func loginTapped(_ sender: UIButton) {
         guard let email = emailTextField.text, !email.isEmpty,
               let password = passwordTextField.text, !password.isEmpty else {
@@ -122,11 +136,8 @@ class LoginSignupViewController: UIViewController {
                 self.showAlert(title: "Login Error", message: error.localizedDescription)
                 return
             }
-            
-            //  Clear previous user's lists
+        
             ActivityManager.shared.resetListsForNewUser()
-
-            // Fetch current user's lists from Firestore
             ActivityManager.shared.fetchUserLists { lists in
                 print("Loaded \(lists.count) lists for current user")
             }
@@ -220,11 +231,13 @@ class LoginSignupViewController: UIViewController {
     }
 
     // MARK: - Helpers
+    /// Validates email format using regex
     func isValidEmail(_ email: String) -> Bool {
         let emailRegEx = "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}"
         return NSPredicate(format:"SELF MATCHES %@", emailRegEx).evaluate(with: email)
     }
 
+    /// Displays a simple alert with optional completion handler
     func showAlert(title: String, message: String, completion: (() -> Void)? = nil) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "OK", style: .default) { _ in

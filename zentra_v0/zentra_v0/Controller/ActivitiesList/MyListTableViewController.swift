@@ -4,9 +4,13 @@
 //
 //  Created by Evelyn Tran on 24/9/2025.
 //
-
-
-// TODO: Need notification (accept or reject shared list)
+// Acknowledgements:
+//
+// Libraries:
+// - Firebase Firestore (Apache 2.0 License) – https://firebase.google.com/docs/firestore
+// - Firebase Auth (Apache 2.0 License) – https://firebase.google.com/docs/auth
+// - Google Places SDK (Google) – https://developers.google.com/places/ios-sdk
+//
 
 
 import UIKit
@@ -15,11 +19,15 @@ import CoreLocation
 import FirebaseAuth
 import FirebaseFirestore
 
+/// View controller that displays the user's activity lists and allows creation, deletion, and sharing of lists.
 class MyListTableViewController: UITableViewController {
 
     let CELL_LIST = "listCell"
     var userLists: [ActivityList] = []
 
+    // MARK: - View Lifecycle
+    /// Called after the controller's view is loaded.
+    /// Sets up table view, navigation items, and registers cell class.
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Activities"
@@ -32,6 +40,8 @@ class MyListTableViewController: UITableViewController {
         ]
     }
 
+    /// Called when the view is about to appear.
+    /// Loads lists from Firestore and observes incoming shared lists.
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         loadListsFromFirestore()
@@ -41,7 +51,8 @@ class MyListTableViewController: UITableViewController {
    
 
 
-    // MARK: - Load lists
+    // MARK: - Load Lists
+    /// Fetches the current user's activity lists from Firestore and reloads the table view.
     private func loadListsFromFirestore() {
         ActivityManager.shared.fetchUserLists { [weak self] lists in
             guard let self = self else { return }
@@ -52,7 +63,10 @@ class MyListTableViewController: UITableViewController {
         }
     }
 
+
     // MARK: - Create New List
+    /// Presents an alert to create a new activity list.
+    /// Uses ActivityManager to save the list to Firestore.
     @objc private func addNewList() {
         let alert = UIAlertController(title: "New Activity List",
                                       message: "Enter a name for your list:",
@@ -91,6 +105,8 @@ class MyListTableViewController: UITableViewController {
     }
 
     // MARK: - Swipe to Delete
+    /// Enables swipe-to-delete functionality for activity lists.
+    /// Deletes the list from local array and Firestore.
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle,
                             forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
@@ -104,11 +120,13 @@ class MyListTableViewController: UITableViewController {
     }
 
     // MARK: - TableView Delegate
+    /// Handles selection of a list. Performs segue to show activities for that list.
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let list = userLists[indexPath.row]
         performSegue(withIdentifier: "showMyActivities", sender: list)
     }
 
+    /// Prepares for segue to activity view, passing the selected list.
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showMyActivities",
            let activityVC = segue.destination as? MyActivityTableViewController,
@@ -117,7 +135,8 @@ class MyListTableViewController: UITableViewController {
         }
     }
 
-    // MARK: - Share Button
+    // MARK: - Share List
+    /// Presents action sheet to select which list to share
     @objc func shareButtonTapped(_ sender: Any) {
         let listSelectionAlert = UIAlertController(title: "Select List to Share", message: nil, preferredStyle: .actionSheet)
         for list in userLists {
@@ -129,15 +148,14 @@ class MyListTableViewController: UITableViewController {
         present(listSelectionAlert, animated: true)
     }
 
+    /// Shows sharing options for a selected list.
     private func showShareOptions(for list: ActivityList) {
         let shareAlert = UIAlertController(title: "Share '\(list.name)' via", message: nil, preferredStyle: .actionSheet)
         
-        // Friend List
         shareAlert.addAction(UIAlertAction(title: "Friend List", style: .default, handler: { _ in
             self.shareViaFriendList(list)
         }))
         
-        // AirDrop / Apps
         shareAlert.addAction(UIAlertAction(title: "AirDrop / Apps", style: .default, handler: { _ in
             self.shareViaAirDrop(list)
         }))
@@ -146,6 +164,7 @@ class MyListTableViewController: UITableViewController {
         present(shareAlert, animated: true)
     }
 
+    /// Navigates to friend list view to share activities via friends.
     private func shareViaFriendList(_ list: ActivityList) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         if let friendListVC = storyboard.instantiateViewController(withIdentifier: "FriendListTableViewController") as? FriendListTableViewController {
@@ -154,6 +173,7 @@ class MyListTableViewController: UITableViewController {
         }
     }
 
+    /// Shares list via AirDrop or other apps using UIActivityViewController.
     private func shareViaAirDrop(_ list: ActivityList) {
         let activityText = list.activities.map { "\($0.name) - \($0.address)" }.joined(separator: "\n")
         let shareText = "Check out my activity list \"\(list.name)\":\n\n\(activityText)"
@@ -164,7 +184,10 @@ class MyListTableViewController: UITableViewController {
         present(activityVC, animated: true)
     }
     
-    // MARK:  Observe Incoming Shared list where sharedList is FirestoreSharedList
+    
+    // MARK: - Observe Shared Lists
+    /// Observes incoming shared lists for the current user.
+    /// Presents alert to accept or reject incoming shared list.
     private func observeIncomingSharedLists() {
         ActivityManager.shared.listenForSharedLists { [weak self] sharedList in
       
@@ -190,7 +213,8 @@ class MyListTableViewController: UITableViewController {
         }
     }
 
-    // MARK: accept: Option 1: Keep same name (create new list), Option 2: Enter a new name,  Option 3: Add to Existing List
+    /// Accepts a shared list and allows the user to keep the same name, rename, or add to an existing list.
+    /// - Parameter sharedList: The `FirestoreSharedList` object received.
     private func acceptSharedList(_ sharedList: FirestoreSharedList) {
         let sharedActivities = sharedList.toActivityList().activities
 
@@ -202,7 +226,7 @@ class MyListTableViewController: UITableViewController {
                                               message: "How would you like to add '\(sharedList.listName)'?",
                                               preferredStyle: .alert)
 
-                
+                /// Option 1: Keep original name
                 alert.addAction(UIAlertAction(title: "Keep Name", style: .default, handler: { _ in
                     let newList = ActivityList(name: sharedList.listName, activities: sharedActivities)
                   
@@ -213,7 +237,7 @@ class MyListTableViewController: UITableViewController {
                     }
                 }))
 
-                
+                /// Option 2: Enter new name
                 alert.addAction(UIAlertAction(title: "Enter New Name", style: .default, handler: { _ in
                     let renameAlert = UIAlertController(title: "New List Name",
                                                         message: "Enter a name for this list:",
@@ -239,7 +263,7 @@ class MyListTableViewController: UITableViewController {
                     self.present(renameAlert, animated: true)
                 }))
 
-                
+                /// Option 3: Add to existing lists
                 for list in lists {
                     alert.addAction(UIAlertAction(title: "Add to '\(list.name)'", style: .default, handler: { _ in
                         var updatedList = list
@@ -263,11 +287,12 @@ class MyListTableViewController: UITableViewController {
     
     
 
-
+    /// Rejects a shared list by removing it from Firestore
     private func rejectSharedList(_ sharedList: FirestoreSharedList) {
         removeSharedList(sharedList)
     }
-
+    
+    /// Removes a shared list document from Firestore.
     private func removeSharedList(_ sharedList: FirestoreSharedList) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         Firestore.firestore()
@@ -282,7 +307,8 @@ class MyListTableViewController: UITableViewController {
 
 }
 
-// MARK: Helper struct for mock sharing
+// MARK: - Helper struct for mock sharing
+/// Represents a mock place used for sharing activity lists with friends.
 struct MockPlace {
     let name: String
     let address: String
