@@ -11,7 +11,7 @@ import CoreLocation
 
 class DirectionsViewController: UIViewController {
 
-    var destination: MKMapItem! // Must be set before presenting this VC
+    var destination: MKMapItem! 
 
     private let mapView = MKMapView()
     private let controlBar = UIView()
@@ -95,7 +95,7 @@ class DirectionsViewController: UIViewController {
         locationManager.startUpdatingLocation()
     }
 
-    // MARK: - Routing
+    // MARK: - Routing, Adjust view, Update ETA, Add destination marker
     private func calculateRoute(mode: MKDirectionsTransportType) {
         guard let userLocation = mapView.userLocation.location else {
             etaLabel.text = "Waiting for location..."
@@ -114,7 +114,8 @@ class DirectionsViewController: UIViewController {
             guard let self = self else { return }
 
             if let error = error {
-                self.etaLabel.text = "Error: \(error.localizedDescription)"
+                print("Error updating ETA: \(error.localizedDescription)")
+                self.etaLabel.text = "No route found"
                 return
             }
 
@@ -127,19 +128,19 @@ class DirectionsViewController: UIViewController {
             self.mapView.removeOverlays(self.mapView.overlays)
             self.mapView.addOverlay(route.polyline)
 
-            // Adjust view
+       
             self.mapView.setVisibleMapRect(
                 route.polyline.boundingMapRect,
                 edgePadding: UIEdgeInsets(top: 80, left: 30, bottom: 200, right: 30),
                 animated: true
             )
 
-            // Update ETA
+            
             let travelTime = Int(route.expectedTravelTime / 60)
             let distance = String(format: "%.1f km", route.distance / 1000)
             self.etaLabel.text = "ETA: \(travelTime) min • \(distance)"
 
-            // Add destination marker
+            
             let destAnnotation = MKPointAnnotation()
             destAnnotation.title = self.destination.name
             destAnnotation.coordinate = self.destination.placemark.coordinate

@@ -25,7 +25,6 @@ class FirebaseController: NSObject {
 
     func startDatabase(for user: FirebaseAuth.User) {
         self.currentUser = user
-        // Any user-specific collection setup can go here
     }
 
     func logout(completion: @escaping (Error?) -> Void) {

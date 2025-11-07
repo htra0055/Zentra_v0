@@ -13,14 +13,15 @@ class FriendManager {
     
     private init() {}
     
-    func shareActivities(_ activities: [MockPlace], with friend: User) {
+    // MARK: share function
+    func shareActivities(_ activities: [MockPlace], with friend: User)
+
+    {
         let db = Firestore.firestore()
-        
         let activitiesData = activities.map { ["name": $0.name, "address": $0.address] }
-        
         let usersRef = db.collection("users")
         
-        // Determine which field to query
+        
         let query: Query
         if let userID = friend.userID, !userID.isEmpty {
             query = usersRef.whereField("userID", isEqualTo: userID)
@@ -45,6 +46,8 @@ class FriendManager {
                 .collection("sharedActivities")
                 .addDocument(data: [
                     "fromUserId": Auth.auth().currentUser?.uid ?? "",
+//                    "fromName": Auth.auth().currentUser?.displayName ?? "Friend",
+//                    "listName": listName,
                     "activities": activitiesData,
                     "timestamp": Timestamp()
                 ]) { error in

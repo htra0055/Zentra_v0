@@ -164,10 +164,10 @@ class MyListTableViewController: UITableViewController {
         present(activityVC, animated: true)
     }
     
-    
+    // MARK:  Observe Incoming Shared list where sharedList is FirestoreSharedList
     private func observeIncomingSharedLists() {
         ActivityManager.shared.listenForSharedLists { [weak self] sharedList in
-            // sharedList is FirestoreSharedList, not ActivityList
+      
             guard let self = self else { return }
 
             DispatchQueue.main.async {
@@ -190,22 +190,79 @@ class MyListTableViewController: UITableViewController {
         }
     }
 
+    // MARK: accept: Option 1: Keep same name (create new list), Option 2: Enter a new name,  Option 3: Add to Existing List
     private func acceptSharedList(_ sharedList: FirestoreSharedList) {
-        let newList = sharedList.toActivityList()
-        
-        ActivityManager.shared.createList(name: newList.name) { error in
-            if let error = error {
-                print("Error creating accepted list: \(error)")
-            } else {
-        
-                ActivityManager.shared.saveList(newList)
-            }
-            self.removeSharedList(sharedList)
-            self.loadListsFromFirestore()
-        }
+        let sharedActivities = sharedList.toActivityList().activities
 
+        ActivityManager.shared.fetchUserLists { [weak self] lists in
+            guard let self = self else { return }
+
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: "Accept Shared List",
+                                              message: "How would you like to add '\(sharedList.listName)'?",
+                                              preferredStyle: .alert)
+
+                
+                alert.addAction(UIAlertAction(title: "Keep Name", style: .default, handler: { _ in
+                    let newList = ActivityList(name: sharedList.listName, activities: sharedActivities)
+                  
+                    ActivityManager.shared.saveList(newList) { error in
+                        if let error = error { print("Error saving new list: \(error)") }
+                        self.removeSharedList(sharedList)
+                        self.loadListsFromFirestore()
+                    }
+                }))
+
+                
+                alert.addAction(UIAlertAction(title: "Enter New Name", style: .default, handler: { _ in
+                    let renameAlert = UIAlertController(title: "New List Name",
+                                                        message: "Enter a name for this list:",
+                                                        preferredStyle: .alert)
+                    renameAlert.addTextField { textField in
+                        textField.placeholder = "List name"
+                        textField.text = sharedList.listName
+                    }
+
+                    renameAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                    renameAlert.addAction(UIAlertAction(title: "Save", style: .default, handler: { _ in
+                        guard let newName = renameAlert.textFields?.first?.text?.trimmingCharacters(in: .whitespaces),
+                              !newName.isEmpty else { return }
+
+                        let newList = ActivityList(name: newName, activities: sharedActivities)
+                        ActivityManager.shared.saveList(newList) { error in
+                            if let error = error { print("Error saving renamed list: \(error)") }
+                            self.removeSharedList(sharedList)
+                            self.loadListsFromFirestore()
+                        }
+                    }))
+
+                    self.present(renameAlert, animated: true)
+                }))
+
+                
+                for list in lists {
+                    alert.addAction(UIAlertAction(title: "Add to '\(list.name)'", style: .default, handler: { _ in
+                        var updatedList = list
+                        let existingNames = Set(list.activities.map { $0.name })
+                        let newActivities = sharedActivities.filter { !existingNames.contains($0.name) }
+                        updatedList.activities.append(contentsOf: newActivities)
+
+                        ActivityManager.shared.updateListInFirestore(updatedList) { error in
+                            if let error = error { print("Error updating list: \(error)") }
+                            self.removeSharedList(sharedList)
+                            self.loadListsFromFirestore()
+                        }
+                    }))
+                }
+
+                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+                self.present(alert, animated: true)
+            }
+        }
     }
     
+    
+
 
     private func rejectSharedList(_ sharedList: FirestoreSharedList) {
         removeSharedList(sharedList)
@@ -222,9 +279,10 @@ class MyListTableViewController: UITableViewController {
     }
 
 
+
 }
 
-// Helper struct for mock sharing
+// MARK: Helper struct for mock sharing
 struct MockPlace {
     let name: String
     let address: String

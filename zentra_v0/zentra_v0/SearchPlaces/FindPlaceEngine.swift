@@ -3,7 +3,7 @@
 //  zentra_v0
 //
 //  Created by Evelyn Tran on 22/9/2025.
-//
+//  Main function to find places based on user's plan, take user input for location, if not, put default
 
 import Foundation
 import CoreLocation
@@ -14,11 +14,9 @@ class FindPlaceEngine {
     static let shared = FindPlaceEngine()
     private init() {}
 
-    // MARK: - Main function to find places based on user's plan
+  
     
-    //v1: take user input for location, if not, put default
-    
-    //This func: Determine search location: user input or device's current location. Fallback to a default coordinate if location not available
+    // MARK: Determine search location: user input or device's current location. Fallback to a default coordinate if location not available
     
     func findPlaces(for plan: Plan,
                     userInputLocation: CLLocationCoordinate2D?, // optional input
@@ -36,20 +34,20 @@ class FindPlaceEngine {
             
 
         }
-        // 1. Build query
+        // MARK: 1. Build query
         var queryParts: [String] = plan.activities.map { $0.query }
         queryParts.append("Find me places that")
         queryParts.append(plan.mood.rawValue)
         queryParts.append(plan.duration.rawValue)
         let query = queryParts.joined(separator: " ")
 
-        // 2. Place properties to fetch
+        // MARK: Place properties to fetch
         let properties: [GMSPlaceProperty] = [
             .name, .placeID, .coordinate, .types, .rating,
             .businessStatus, .openingHours,  .photos
         ]
 
-        // 3. Create request
+        // MARK: Create request
         let request = GMSPlaceSearchByTextRequest(
             textQuery: query,
             placeProperties: properties.map { $0.rawValue }
@@ -60,7 +58,7 @@ class FindPlaceEngine {
         request.locationBias = GMSPlaceCircularLocationOption(searchLocation, 5000) // 5km
         request.isStrictTypeFiltering = false
 
-        // 4. Perform search
+        // MARK: Perform search
         GMSPlacesClient.shared().searchByText(with: request) { results, error in
             if let error = error {
                 print("Places API error: \(error.localizedDescription)")
@@ -81,7 +79,7 @@ class FindPlaceEngine {
     
   
     
-    // MARK: - Helper: check if a place is open
+    // MARK:  Helper: check if a place is open
     func isPlaceOpen(_ place: GMSPlace,
                      completion: @escaping (GMSPlaceOpenStatus) -> Void) {
         let openRequest = GMSPlaceIsOpenRequest(place: place, date: nil)

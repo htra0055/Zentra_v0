@@ -177,7 +177,6 @@ class LoginSignupViewController: UIViewController {
         let saveAction = UIAlertAction(title: "Save", style: .default) { _ in
             let customID = alert.textFields?.first?.text?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
             if !customID.isEmpty {
-                // Save userID to Firestore
                 self.db.collection("users").document(user.uid).updateData([
                     "userID": customID
                 ]) { error in

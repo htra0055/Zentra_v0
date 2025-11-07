@@ -14,7 +14,7 @@ struct User: Codable {
     var name: String?
     var userID: String?
     
-    // Initialize from Firestore data dictionary
+    // MARK: Initialize from Firestore data dictionary
     init?(from data: [String: Any]) {
         guard let uid = data["uid"] as? String,
               let email = data["email"] as? String else {
@@ -26,7 +26,7 @@ struct User: Codable {
         self.userID = data["userID"] as? String
     }
 
-    // Initialize directly
+    // MARK: Initialize directly
     init(uid: String, email: String, name: String? = nil, userID: String? = nil) {
         self.uid = uid
         self.email = email

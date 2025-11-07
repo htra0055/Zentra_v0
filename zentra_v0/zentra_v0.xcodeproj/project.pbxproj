@@ -9,6 +9,8 @@
 /* Begin PBXBuildFile section */
 		7B1442A52E841D0F0018CB54 /* GooglePlaces in Frameworks */ = {isa = PBXBuildFile; productRef = 7B1442A42E841D0F0018CB54 /* GooglePlaces */; };
 		7B1442A72E841D0F0018CB54 /* GooglePlacesSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 7B1442A62E841D0F0018CB54 /* GooglePlacesSwift */; };
+		7B2F152D2EBD7786007D519A /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = 7B2F152C2EBD7786007D519A /* FirebaseStorage */; };
+		7B2F152F2EBD7786007D519A /* FirebaseStorageCombine-Community in Frameworks */ = {isa = PBXBuildFile; productRef = 7B2F152E2EBD7786007D519A /* FirebaseStorageCombine-Community */; };
 		7B919D512E84BBBE00BEF517 /* GoogleMaps in Frameworks */ = {isa = PBXBuildFile; productRef = 7B919D502E84BBBE00BEF517 /* GoogleMaps */; };
 		7BE6EDD82E7AA495002779C8 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 7BE6EDD72E7AA495002779C8 /* FirebaseAuth */; };
 		7BE6EDDA2E7AA495002779C8 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 7BE6EDD92E7AA495002779C8 /* FirebaseFirestore */; };
@@ -45,10 +47,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				7B1442A52E841D0F0018CB54 /* GooglePlaces in Frameworks */,
+				7B2F152F2EBD7786007D519A /* FirebaseStorageCombine-Community in Frameworks */,
 				7BE6EDD82E7AA495002779C8 /* FirebaseAuth in Frameworks */,
 				7B919D512E84BBBE00BEF517 /* GoogleMaps in Frameworks */,
 				7BE6EDDA2E7AA495002779C8 /* FirebaseFirestore in Frameworks */,
 				7B1442A72E841D0F0018CB54 /* GooglePlacesSwift in Frameworks */,
+				7B2F152D2EBD7786007D519A /* FirebaseStorage in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +100,8 @@
 				7B1442A42E841D0F0018CB54 /* GooglePlaces */,
 				7B1442A62E841D0F0018CB54 /* GooglePlacesSwift */,
 				7B919D502E84BBBE00BEF517 /* GoogleMaps */,
+				7B2F152C2EBD7786007D519A /* FirebaseStorage */,
+				7B2F152E2EBD7786007D519A /* FirebaseStorageCombine-Community */,
 			);
 			productName = zentra_v0;
 			productReference = 7BE6ED862E7A7F1E002779C8 /* zentra_v0.app */;
@@ -408,6 +414,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 7B1442A32E841D0F0018CB54 /* XCRemoteSwiftPackageReference "ios-places-sdk" */;
 			productName = GooglePlacesSwift;
+		};
+		7B2F152C2EBD7786007D519A /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7BE6EDD62E7AA495002779C8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
+		7B2F152E2EBD7786007D519A /* FirebaseStorageCombine-Community */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7BE6EDD62E7AA495002779C8 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = "FirebaseStorageCombine-Community";
 		};
 		7B919D502E84BBBE00BEF517 /* GoogleMaps */ = {
 			isa = XCSwiftPackageProductDependency;

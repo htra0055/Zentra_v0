@@ -38,7 +38,7 @@ class FriendListTableViewController: UITableViewController {
                                                            target: self,
                                                            action: #selector(addFriendTapped))
 
-        // Add a back/close button if presented modally
+  
         if presentingViewController != nil && navigationController?.viewControllers.first == self {
             let closeButton = UIBarButtonItem(barButtonSystemItem: .close,
                                               target: self,
@@ -47,7 +47,7 @@ class FriendListTableViewController: UITableViewController {
         }
     }
 
-    // MARK: - Close Modal
+    // MARK: - Close Modal,  Add a back/close button if presented modally
     @objc private func closeButtonTapped() {
         dismiss(animated: true)
     }
@@ -66,10 +66,11 @@ class FriendListTableViewController: UITableViewController {
         present(alert, animated: true)
     }
 
+    // MARK: Determine whether to query by email or userID. Safely extract fields with fallback value. Check if already added. Update current user's friends array in Firestore. Append new friend and reload table on main thread
     private func addFriend(withIdentifier identifier: String) {
         guard let currentUID = Auth.auth().currentUser?.uid else { return }
 
-        // Determine whether to query by email or userID
+        
         let queryField: String = identifier.contains("@") ? "email" : "userID"
 
         db.collection("users").whereField(queryField, isEqualTo: identifier).getDocuments { snapshot, error in
@@ -86,7 +87,7 @@ class FriendListTableViewController: UITableViewController {
 
             let data = doc.data()
 
-            // Safely extract fields with fallback values
+            
             let uid = data["uid"] as? String ?? doc.documentID
             let email = data["email"] as? String ?? "Unknown Email"
             let name = data["name"] as? String ?? email
@@ -94,13 +95,12 @@ class FriendListTableViewController: UITableViewController {
 
             let newFriend = User(uid: uid, email: email, name: name, userID: userID)
 
-            // Check if already added
+            
             if self.friends.contains(where: { $0.uid == newFriend.uid }) {
                 self.showAlert(title: "Info", message: "Friend already added")
                 return
             }
-
-            // Update current user's friends array in Firestore
+            
             let currentUserRef = self.db.collection("users").document(currentUID)
             currentUserRef.updateData(["friends": FieldValue.arrayUnion([newFriend.uid])]) { error in
                 if let error = error {
@@ -108,7 +108,7 @@ class FriendListTableViewController: UITableViewController {
                     return
                 }
 
-                // Append new friend and reload table on main thread
+        
                 DispatchQueue.main.async {
                     self.friends.append(newFriend)
                     self.tableView.reloadData()
@@ -130,13 +130,6 @@ class FriendListTableViewController: UITableViewController {
     // MARK: - TableView DataSource & Delegate
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int { friends.count }
 
-//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "friendCell", for: indexPath)
-//        let friend = friends[indexPath.row]
-//        cell.textLabel?.text = friend.name ?? friend.email
-//        cell.accessoryType = selectedFriends.contains(where: { $0.uid == friend.uid }) ? .checkmark : .none
-//        return cell
-//    }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "friendCell", for: indexPath)
@@ -170,14 +163,14 @@ class FriendListTableViewController: UITableViewController {
         tableView.reloadRows(at: [indexPath], with: .automatic)
     }
     
-    // Enable swipe-to-delete
+    // MARK: Enable swipe-to-delete. Remove from Firestore current user's friends array. Remove locally and update table view
     override func tableView(_ tableView: UITableView,
                             commit editingStyle: UITableViewCell.EditingStyle,
                             forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let friendToRemove = friends[indexPath.row]
 
-            // Remove from Firestore current user's friends array
+            
             guard let currentUID = Auth.auth().currentUser?.uid else { return }
             let currentUserRef = db.collection("users").document(currentUID)
             currentUserRef.updateData(["friends": FieldValue.arrayRemove([friendToRemove.uid])]) { error in
@@ -187,7 +180,6 @@ class FriendListTableViewController: UITableViewController {
                     return
                 }
 
-                // Remove locally and update table view
                 DispatchQueue.main.async {
                     self.friends.remove(at: indexPath.row)
                     tableView.deleteRows(at: [indexPath], with: .automatic)
@@ -196,7 +188,7 @@ class FriendListTableViewController: UITableViewController {
         }
     }
 
-    // Optional: customize the swipe delete button title
+    // MARK: customize the swipe delete button title
     override func tableView(_ tableView: UITableView,
                             titleForDeleteConfirmationButtonForRowAt indexPath: IndexPath) -> String? {
         return "Remove"
@@ -217,19 +209,31 @@ class FriendListTableViewController: UITableViewController {
         }
     }
 
+    // Mark: shared activities, add new collection to database
     private func shareActivities(with friend: User) {
         let activitiesData = activitiesToShare.map { ["name": $0.name, "address": $0.address] }
 
-        db.collection("users").document(friend.uid).collection("sharedActivities").addDocument(data: [
-            "fromUserId": Auth.auth().currentUser?.uid ?? "",
+        let data: [String: Any] = [
+            "fromUID": Auth.auth().currentUser?.uid ?? "",
+            "fromName": UserDefaults.standard.string(forKey: "displayName_\(Auth.auth().currentUser?.uid ?? "")") ?? "Someone",
+            "listName": "Shared Activities",
             "activities": activitiesData,
             "timestamp": Timestamp()
-        ]) { error in
-            if let error = error {
-                print("Error sharing activities: \(error.localizedDescription)")
+        ]
+
+        Firestore.firestore()
+            .collection("sharedActivities")
+            .document(friend.uid)
+            .collection("sharedLists")
+            .addDocument(data: data) { error in
+                if let error = error {
+                    print("Error sharing activities: \(error.localizedDescription)")
+                }
             }
-        }
     }
+
+  
+
 
     // MARK: - Load Friends
     private func loadFriends() {

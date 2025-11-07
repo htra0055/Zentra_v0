@@ -15,7 +15,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
 
     private let locationManager = CLLocationManager()
 
-    // Bottom sheet
+  
     private var bottomSheet: UIView!
     private var resultsTable: UITableView!
     private var bottomSheetHeightConstraint: NSLayoutConstraint!
@@ -168,6 +168,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
+    // MARK: Create empty list, Fetch latest lists to get the newly created one, Add the activity, Update Firestore with the list containing the activity
     private func createNewListWithActivity(_ item: MKMapItem) {
         let alert = UIAlertController(title: "New List", message: "Enter a name for your new list", preferredStyle: .alert)
         alert.addTextField { $0.placeholder = "List Name" }
@@ -175,7 +176,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         alert.addAction(UIAlertAction(title: "Create", style: .default, handler: { _ in
             guard let listName = alert.textFields?.first?.text, !listName.isEmpty else { return }
 
-            // Step 1: Create empty list
+   
             ActivityManager.shared.createList(name: listName) { [weak self] error in
                 guard let self = self else { return }
                 if let error = error {
@@ -183,11 +184,11 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
                     return
                 }
 
-                // Step 2: Fetch latest lists to get the newly created one
+       
                 ActivityManager.shared.fetchUserLists { lists in
                     guard let newList = lists.first(where: { $0.name == listName }) else { return }
 
-                    // Step 3: Add the activity
+          
                     let activity = SavedActivity(
                         name: item.name ?? "Unknown Place",
                         placeID: item.placemark.name ?? UUID().uuidString,
@@ -196,7 +197,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
                     var updatedList = newList
                     updatedList.activities.append(activity)
 
-                    // Step 4: Update Firestore with the list containing the activity
+          
                     ActivityManager.shared.updateListInFirestore(updatedList) { error in
                         DispatchQueue.main.async {
                             if let error = error {
@@ -220,26 +221,26 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         present(alert, animated: true)
     }
 
-
+    // MARK: Fetch latest lists from Firestore. No lists exist, only option is to create new list. Show existing lists and Option to create a new list
     private func savePlaceToList(_ item: MKMapItem) {
-        // Fetch latest lists from Firestore
+        
         ActivityManager.shared.fetchUserLists { lists in
             DispatchQueue.main.async {
                 let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
 
                 if lists.isEmpty {
-                    // No lists exist, only option is to create new list
+                  
                     alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
                         self.createNewListWithActivity(item)
                     }))
                 } else {
-                    // Show existing lists
+                  
                     for list in lists {
                         alert.addAction(UIAlertAction(title: list.name, style: .default, handler: { _ in
                             self.saveItem(item, to: list)
                         }))
                     }
-                    // Option to create a new list
+                   
                     alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
                         self.createNewListWithActivity(item)
                     }))
@@ -321,31 +322,17 @@ extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
         present(alert, animated: true)
     }
 
-//    private func showPlaceDetails(_ item: MKMapItem) {
-//        let message = "Address: \(item.placemark.title ?? "Unknown")\nPhone: \(item.phoneNumber ?? "N/A")"
-//        let detailsAlert = UIAlertController(title: item.name, message: message, preferredStyle: .alert)
-//        detailsAlert.addAction(UIAlertAction(title: "Open in Safari", style: .default, handler: { _ in
-//            if let name = item.name, let address = item.placemark.title {
-//                let query = "\(name) \(address)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
-//                if let query = query, let url = URL(string: "https://www.google.com/search?q=\(query)") {
-//                    UIApplication.shared.open(url)
-//                }
-//            }
-//        }))
-//        detailsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-//        present(detailsAlert, animated: true)
-//    }
-
+    // MARK: Construct message with address + phone, Combine name + address for Google search, Cancel option
     private func showPlaceDetails(_ item: MKMapItem) {
-        // Construct message with address + phone
+        
         let message = """
         Address: \(item.placemark.title ?? "Unknown")
         Phone: \(item.phoneNumber ?? "N/A")
         """
-//        var placemark: MKPlacemark { get }
+
         let detailsAlert = UIAlertController(title: item.name, message: message, preferredStyle: .alert)
         detailsAlert.addAction(UIAlertAction(title: "Open in Safari", style: .default, handler: { _ in
-            // Combine name + address for Google search
+            
             if let name = item.name,
                let address = item.placemark.title {
                 let query = "\(name) \(address)".addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
@@ -355,7 +342,7 @@ extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
             }
         }))
 
-        // Cancel option
+        
         detailsAlert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
 
         present(detailsAlert, animated: true)

@@ -69,16 +69,16 @@ class ActivityManager {
     
     
 
-    // MARK: - Delete List
+    // MARK: - Delete List,  Remove from local cache,  Remove from Firestore
     func deleteList(_ list: ActivityList, completion: ((Error?) -> Void)? = nil) {
         guard let uid = Auth.auth().currentUser?.uid else { return }
         
-        // Remove from local cache
+     
         if let index = userLists.firstIndex(where: { $0.id == list.id }) {
             userLists.remove(at: index)
         }
         
-        // Remove from Firestore
+        
         Firestore.firestore()
             .collection("users").document(uid)
             .collection("activityLists").document(list.id.uuidString)
@@ -104,11 +104,12 @@ class ActivityManager {
         )
     }
 
+    // MARK:  Preserve Firestore document ID as UUID
     func convertToLocal(_ firestoreList: FirestoreActivityList) -> ActivityList {
         let activities = firestoreList.activities.map {
             SavedActivity(name: $0.name, placeID: $0.placeID, address: $0.address)
         }
-        // Preserve Firestore document ID as UUID
+     
         return ActivityList(
             id: UUID(uuidString: firestoreList.id) ?? UUID(),
             name: firestoreList.name,
@@ -120,7 +121,7 @@ class ActivityManager {
 // MARK: - Firestore Extension Methods
 extension ActivityManager {
 
-    /// Update a list in Firestore
+    // MARK: Update a list in Firestore
     func updateListInFirestore(_ list: ActivityList, completion: ((Error?) -> Void)? = nil) {
         guard let currentUID = Auth.auth().currentUser?.uid else { return }
         let db = Firestore.firestore()
@@ -199,9 +200,11 @@ extension ActivityManager {
                    }
                }
        }
-
-
     
+    
+    
+
+
 
     
 }
