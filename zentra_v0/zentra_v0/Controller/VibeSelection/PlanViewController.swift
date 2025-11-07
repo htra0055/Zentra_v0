@@ -4,8 +4,18 @@
 //
 //  Created by Evelyn Tran on 23/10/2025.
 //
-
-// TODO: when search, must include place + address
+// Acknowledgements:
+//
+// Libraries & SDKs:
+// - Google Places SDK for iOS (Google) – https://developers.google.com/places/ios-sdk
+// - Google Places Swift SDK (Google) – https://developers.google.com/places/ios-sdk/swift
+// - CoreLocation (Apple) – https://developer.apple.com/documentation/corelocation
+//
+// Purpose:
+// Displays a user's plan and associated nearby places.
+// Supports fetching places from Google Places, showing photos, and adding selected places
+// to user's activity lists. Includes error handling for missing locations or failed queries.
+//
 
 
 import UIKit
@@ -13,9 +23,13 @@ import CoreLocation
 import GooglePlaces
 import GooglePlacesSwift
 
+/// `PlanViewController` displays the places associated with a given `Plan` object.
+/// Users can view place details, search on Google, or add them to their activity lists.
 class PlanViewController: UIViewController {
 
     // MARK: - Properties
+    
+    /// The current plan to display
     var plan: Plan? {
         didSet {
             if isViewLoaded, let plan = plan {
@@ -24,12 +38,21 @@ class PlanViewController: UIViewController {
         }
     }
 
+    /// Places currently displayed in the scroll view
     private var displayedPlaces: [GMSPlace] = []
 
+    /// ScrollView container for dynamically added place views
     @IBOutlet weak var placesScrollView: UIScrollView!
+    
+    /// StackView inside scrollView to hold place views
     private let contentStack = UIStackView()
 
+    
     // MARK: - Lifecycle
+    /**
+     Configures the view and sets up the scroll view.
+     If a `plan` is already set, fetches nearby places.
+     */
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
@@ -41,6 +64,10 @@ class PlanViewController: UIViewController {
     }
 
     // MARK: - ScrollView Setup
+    /**
+    Sets up the stack view inside the scroll view with proper constraints
+    for vertical scrolling and spacing between place containers.
+    */
     private func setupScrollView() {
         contentStack.axis = .vertical
         contentStack.spacing = 16
@@ -58,6 +85,12 @@ class PlanViewController: UIViewController {
     }
 
     // MARK: - Fetch Places
+    /**
+     Fetches places relevant to the given plan using `FindPlaceEngine`.
+     - Parameter plan: The plan object containing location and preferences.
+     If the user location is missing, an alert is shown and a default location may be used.
+     On success, calls `displayPlaces(_:)`. On failure or no results, shows an alert.
+     */
     private func fetchPlaces(for plan: Plan) {
         // Clear previous views
         contentStack.arrangedSubviews.forEach { view in
@@ -104,6 +137,11 @@ class PlanViewController: UIViewController {
     }
 
     // MARK: - Display Places
+      /**
+       Dynamically adds place views to the scroll view stack.
+       - Parameter places: Array of `GMSPlace` to display.
+       Each view includes the place name, optional photo, and tap gesture to handle user actions.
+       */
     private func displayPlaces(_ places: [GMSPlace]) {
         self.displayedPlaces = places
 
@@ -160,7 +198,12 @@ class PlanViewController: UIViewController {
         }
     }
 
-    // MARK: - Place Tapped
+    // MARK: - Place Actions
+    /**
+     Handles tap on a place container, allowing the user to:
+     - Search place details via Google search
+     - Add the place to an existing or new activity list
+     */
     @objc private func placeTapped(_ sender: UITapGestureRecognizer) {
         guard let container = sender.view else { return }
         let index = container.tag
@@ -184,30 +227,13 @@ class PlanViewController: UIViewController {
         present(alert, animated: true)
     }
 
-    // MARK: - Add Place to Activities (ActivityList version)
-//    private func addPlaceToActivities(_ place: GMSPlace) {
-//        ActivityManager.shared.fetchUserLists { lists in
-//            DispatchQueue.main.async {
-//                let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
-//
-//                for list in lists {
-//                    alert.addAction(UIAlertAction(title: list.name, style: .default, handler: { _ in
-//                        self.addPlace(place, to: list)
-//                    }))
-//                }
-//
-//                alert.addAction(UIAlertAction(title: "Create New List", style: .default, handler: { _ in
-//                    self.createNewListAndAdd(place: place)
-//                }))
-//
-//                alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-//                self.present(alert, animated: true)
-//            }
-//        }
-//    }
-    
+
+    // MARK: - Add Place to Activities
+       /**
+        Presents UI to add a `GMSPlace` to an existing list or create a new list.
+        - Parameter place: The place to add.
+        */
     private func addPlaceToActivities(_ place: GMSPlace) {
-        // Fetch AND update local cache first
         ActivityManager.shared.fetchUserListsForCurrentUser { lists in
             DispatchQueue.main.async {
                 let alert = UIAlertController(title: "Select a list", message: nil, preferredStyle: .alert)
@@ -229,6 +255,12 @@ class PlanViewController: UIViewController {
     }
 
 
+    /**
+     Adds a `GMSPlace` to a specific `ActivityList`.
+     - Parameters:
+        - place: The place to add.
+        - list: The activity list to which the place will be added.
+     */
     private func addPlace(_ place: GMSPlace, to list: ActivityList) {
         ActivityManager.shared.addActivity(place: place, toList: list) { error in
             DispatchQueue.main.async {
@@ -248,6 +280,10 @@ class PlanViewController: UIViewController {
     }
 
 
+    /**
+     Creates a new activity list and adds the specified place to it.
+     - Parameter place: The place to add to the newly created list.
+     */
     private func createNewListAndAdd(place: GMSPlace) {
         let alert = UIAlertController(title: "New List", message: "Enter a name for your new list", preferredStyle: .alert)
         alert.addTextField { $0.placeholder = "List Name" }
@@ -273,6 +309,10 @@ class PlanViewController: UIViewController {
     }
 
     // MARK: - Error Handling
+      /**
+       Displays an alert for a given error.
+       - Parameter error: The error to display.
+       */
     private func showError(_ error: Error) {
         let alert = UIAlertController(title: "Error", message: error.localizedDescription, preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "OK", style: .default))

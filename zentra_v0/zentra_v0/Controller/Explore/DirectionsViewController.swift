@@ -4,6 +4,17 @@
 //
 //  Created by Evelyn Tran on 22/10/2025.
 //
+// Acknowledgements:
+//
+// Libraries:
+// - Firebase Firestore (Apache 2.0 License) – https://firebase.google.com/docs/firestore
+// - Firebase Auth (Apache 2.0 License) – https://firebase.google.com/docs/auth
+// - Google Places SDK (Google) – https://developers.google.com/places/ios-sdk
+//
+//External Resources / Tutorials:
+//- StackOverflow – various Swift Firestore examples (https://stackoverflow.com/questions/70864512/get-all-collections-that-are-declared-on-document-swift-firestore-firebase)
+//- YouTube tutorial on GMSPlace integration (https://www.youtube.com/watch?v=Jj7f5W2W1h0)
+
 
 import UIKit
 import MapKit
@@ -25,6 +36,7 @@ class DirectionsViewController: UIViewController {
     private var isNavigating = false
 
     // MARK: - Lifecycle
+    /// Sets up the view, map, control bar, and location manager when the view loads.
     override func viewDidLoad() {
         super.viewDidLoad()
         title = destination?.name ?? "Directions"
@@ -36,6 +48,7 @@ class DirectionsViewController: UIViewController {
     }
 
     // MARK: - Setup
+    /// Configures the MKMapView, sets delegate, shows user location, and enables tracking.
     private func setupMapView() {
         mapView.frame = view.bounds
         mapView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -45,6 +58,7 @@ class DirectionsViewController: UIViewController {
         view.addSubview(mapView)
     }
 
+    /// Configures the bottom control bar with transport mode selector, ETA label, and start navigation button.
     private func setupControlBar() {
         controlBar.translatesAutoresizingMaskIntoConstraints = false
         controlBar.backgroundColor = UIColor.systemBackground.withAlphaComponent(0.9)
@@ -88,6 +102,7 @@ class DirectionsViewController: UIViewController {
         ])
     }
 
+    /// Configures CLLocationManager, requests user location permission, and starts updating location.
     private func setupLocationManager() {
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
@@ -95,7 +110,11 @@ class DirectionsViewController: UIViewController {
         locationManager.startUpdatingLocation()
     }
 
+    
     // MARK: - Routing, Adjust view, Update ETA, Add destination marker
+    /// Calculates a route from the user's current location to the destination using the specified transport mode.
+    /// Updates the map with route overlay, centers the map, updates ETA label, and adds destination annotation.
+    /// - Parameter mode: The transport type (drive, walk, or transit).
     private func calculateRoute(mode: MKDirectionsTransportType) {
         guard let userLocation = mapView.userLocation.location else {
             etaLabel.text = "Waiting for location..."
@@ -149,10 +168,12 @@ class DirectionsViewController: UIViewController {
     }
 
     // MARK: - Actions
+    /// Triggered when the transport mode segmented control is changed. Recalculates the route accordingly.
     @objc private func modeChanged() {
         calculateRoute(mode: currentTransportType())
     }
 
+    /// Starts navigation along the current route. Centers map on user and updates UI accordingly.
     @objc private func startNavigation() {
         guard let route = currentRoute else {
             let alert = UIAlertController(title: "Route Not Ready", message: "Please wait until your location and route are loaded.", preferredStyle: .alert)
@@ -174,6 +195,7 @@ class DirectionsViewController: UIViewController {
     }
 
 
+    /// Returns the currently selected transport type based on the segmented control.
     private func currentTransportType() -> MKDirectionsTransportType {
         switch modeControl.selectedSegmentIndex {
         case 1: return .walking
@@ -185,6 +207,9 @@ class DirectionsViewController: UIViewController {
 
 // MARK: - CLLocationManagerDelegate
 extension DirectionsViewController: CLLocationManagerDelegate {
+    
+    // MARK: - CLLocationManagerDelegate
+    /// Called when location authorization status changes. Starts location updates if authorized, otherwise updates ETA label.
     func locationManagerDidChangeAuthorization(_ manager: CLLocationManager) {
         if manager.authorizationStatus == .authorizedWhenInUse || manager.authorizationStatus == .authorizedAlways {
             locationManager.startUpdatingLocation()
@@ -194,6 +219,8 @@ extension DirectionsViewController: CLLocationManagerDelegate {
         }
     }
 
+    /// Called when new location updates are received. Updates ETA label, centers map on first update, and tracks user while navigating.
+    /// - Parameter locations: Array of CLLocation objects from the location manager.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
 
@@ -216,6 +243,13 @@ extension DirectionsViewController: CLLocationManagerDelegate {
 
 // MARK: - MKMapViewDelegate
 extension DirectionsViewController: MKMapViewDelegate {
+    
+    // MARK: - MKMapViewDelegate
+    /**
+    Returns a renderer for a map overlay. Configures polyline appearance for routes.
+    - Parameter overlay: The overlay to render.
+    - Returns: MKOverlayRenderer configured for the overlay.
+     */
     func mapView(_ mapView: MKMapView, rendererFor overlay: MKOverlay) -> MKOverlayRenderer {
         guard let polyline = overlay as? MKPolyline else { return MKOverlayRenderer(overlay: overlay) }
         let renderer = MKPolylineRenderer(polyline: polyline)

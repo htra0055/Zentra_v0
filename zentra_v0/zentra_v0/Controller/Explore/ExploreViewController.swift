@@ -4,6 +4,17 @@
 //
 //  Created by Evelyn Tran on 25/9/2025.
 //
+// Acknowledgements:
+//
+// Libraries:
+// - Firebase Firestore (Apache 2.0 License) – https://firebase.google.com/docs/firestore
+// - Firebase Auth (Apache 2.0 License) – https://firebase.google.com/docs/auth
+// - Google Places SDK (Google) – https://developers.google.com/places/ios-sdk
+//
+//External Resources / Tutorials:
+//- StackOverflow – various Swift Firestore examples (https://stackoverflow.com/questions/70864512/get-all-collections-that-are-declared-on-document-swift-firestore-firebase)
+//- YouTube tutorial on GMSPlace integration (https://www.youtube.com/watch?v=Jj7f5W2W1h0)
+
 
 import UIKit
 import MapKit
@@ -22,6 +33,8 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
 
     private var placeResults: [MKMapItem] = []
 
+    // MARK: - Lifecycle
+    /// Sets up map view, search bar, bottom sheet, and location manager on view load.
     override func viewDidLoad() {
         super.viewDidLoad()
         title = "Explore"
@@ -37,7 +50,9 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         locationManager.startUpdatingLocation()
     }
 
+   
     // MARK: - Search
+    /// Configures UISearchController and integrates it into the navigation bar.
     private func setupSearch() {
         let searchController = UISearchController(searchResultsController: nil)
         searchController.searchBar.delegate = self
@@ -47,11 +62,15 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         definesPresentationContext = true
     }
 
+    // Triggered when search button is tapped. Performs local search for entered query.
+    /// - Parameter searchBar: The UISearchBar that initiated the search.
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
         performSearch(query: searchBar.text ?? "")
     }
-
+    
+    /// Performs a local search using MKLocalSearch with the given query and updates results.
+    /// - Parameter query: The search query string.
     func performSearch(query: String) {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = query
@@ -67,6 +86,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
+    /// Updates map annotations to reflect current search results.
     private func updateMapAnnotations() {
         mapView.removeAnnotations(mapView.annotations)
         for item in placeResults {
@@ -78,6 +98,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
     }
 
     // MARK: - Bottom Sheet
+    /// Sets up the bottom sheet UI and results table for displaying search results.
     private func setupBottomSheet() {
         bottomSheet = UIView()
         bottomSheet.translatesAutoresizingMaskIntoConstraints = false
@@ -107,6 +128,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         bottomSheetHeightConstraint.isActive = true
     }
 
+    /// Expands the bottom sheet based on the number of search results.
     private func expandBottomSheet() {
         let newHeight: CGFloat = min(CGFloat(placeResults.count) * 60 + 80, 400)
         UIView.animate(withDuration: 0.3) {
@@ -115,6 +137,7 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
+    /// Collapses the bottom sheet to default height.
     private func collapseBottomSheet() {
         UIView.animate(withDuration: 0.3) {
             self.bottomSheetHeightConstraint.constant = 80
@@ -122,6 +145,10 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
+    /// Performs a nearby search around a given coordinate using a keyword.
+    /// - Parameters:
+    ///   - coordinate: The center coordinate for the search.
+    ///   - keyword: The keyword to search for (e.g., "restaurant").
     private func performNearbySearch(at coordinate: CLLocationCoordinate2D, keyword: String) {
         let request = MKLocalSearch.Request()
         request.naturalLanguageQuery = keyword
@@ -139,7 +166,12 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
+
     // MARK: - Save Activity Helpers
+    /// Saves a selected place to an existing activity list and updates Firestore.
+    /// - Parameters:
+    ///   - item: The MKMapItem to save.
+    ///   - list: The ActivityList to save the item into.
     private func saveItem(_ item: MKMapItem, to list: ActivityList) {
         let activity = SavedActivity(
             name: item.name ?? "Unknown Place",
@@ -168,7 +200,8 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
-    // MARK: Create empty list, Fetch latest lists to get the newly created one, Add the activity, Update Firestore with the list containing the activity
+    /// Creates a new activity list, adds the selected place to it, and updates Firestore.
+    /// - Parameter item: The MKMapItem to save in the new list.
     private func createNewListWithActivity(_ item: MKMapItem) {
         let alert = UIAlertController(title: "New List", message: "Enter a name for your new list", preferredStyle: .alert)
         alert.addTextField { $0.placeholder = "List Name" }
@@ -221,7 +254,8 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         present(alert, animated: true)
     }
 
-    // MARK: Fetch latest lists from Firestore. No lists exist, only option is to create new list. Show existing lists and Option to create a new list
+    /// Displays a list selection alert and allows user to save a place to an existing list or create a new one.
+    /// - Parameter item: The MKMapItem to save.
     private func savePlaceToList(_ item: MKMapItem) {
         
         ActivityManager.shared.fetchUserLists { lists in
@@ -252,16 +286,13 @@ class ExploreViewController: UIViewController, UISearchBarDelegate {
         }
     }
 
-
-
-
-
-
-
 }
 
 // MARK: - CLLocationManagerDelegate
 extension ExploreViewController: CLLocationManagerDelegate {
+    
+    // MARK: - CLLocationManagerDelegate
+    /// Handles changes in location authorization and updates map settings accordingly.
     func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
         if status == .authorizedWhenInUse || status == .authorizedAlways {
             mapView.showsUserLocation = true
@@ -269,6 +300,8 @@ extension ExploreViewController: CLLocationManagerDelegate {
         }
     }
 
+    /// Receives location updates, centers the map on the user, adds annotation, and performs nearby search.
+    /// - Parameter locations: Array of CLLocation objects.
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
         guard let location = locations.last else { return }
         locationManager.stopUpdatingLocation()
@@ -284,10 +317,17 @@ extension ExploreViewController: CLLocationManagerDelegate {
 
 // MARK: - UITableViewDataSource & Delegate
 extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
+    
+    // MARK: - UITableViewDataSource & Delegate
+    /// Returns number of search result rows in the results table.
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return placeResults.count
     }
 
+    /// Configures a table view cell to display a search result with name and address.
+    /// - Parameters:
+    ///   - tableView: The UITableView displaying results.
+    ///   - indexPath: The index path of the cell.
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "cell")
         let item = placeResults[indexPath.row]
@@ -296,6 +336,10 @@ extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
         return cell
     }
 
+    /// Handles selection of a search result, providing options to view details, get directions, or save to list.
+    /// - Parameters:
+    ///   - tableView: The UITableView displaying results.
+    ///   - indexPath: The index path of the selected cell.
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let item = placeResults[indexPath.row]
         mapView.setCenter(item.placemark.coordinate, animated: true)
@@ -322,7 +366,8 @@ extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
         present(alert, animated: true)
     }
 
-    // MARK: Construct message with address + phone, Combine name + address for Google search, Cancel option
+    /// Displays detailed information about a selected place and allows opening in Safari or canceling.
+    /// - Parameter item: The MKMapItem to show details for.
     private func showPlaceDetails(_ item: MKMapItem) {
         
         let message = """
@@ -352,4 +397,5 @@ extension ExploreViewController: UITableViewDataSource, UITableViewDelegate {
 }
 
 // MARK: - MKMapViewDelegate
+/// Placeholder for MKMapViewDelegate methods for map customization.
 extension ExploreViewController: MKMapViewDelegate {}
